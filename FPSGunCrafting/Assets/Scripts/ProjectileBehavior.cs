@@ -124,7 +124,6 @@ public class ProjectileBehavior : MonoBehaviour
             GameObject AoE = Instantiate(AoEObject, transform.position, transform.rotation, null) as GameObject;
             AoE.GetComponent<AoEDamage>().AoEDamageValue = projectileDamage;
             AoE.GetComponent<AoEDamage>().AoESize = projectileAoESize;
-            //print(AoE.transform.position);
         }
     }
 }

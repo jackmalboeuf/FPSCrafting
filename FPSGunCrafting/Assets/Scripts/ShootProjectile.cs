@@ -12,65 +12,75 @@ public class ShootProjectile : MonoBehaviour
     Slider reloadSlider;
     [SerializeField]
     Slider overheatSlider;
-    [SerializeField]
-    float fireRate;
-    [SerializeField]
-    float accuracy;
-    [SerializeField]
-    float velocity;
-    [SerializeField]
+    //[SerializeField]
+    float fireRate = 0.3f;
+    //[SerializeField]
+    float accuracy = 5;
+    //[SerializeField]
+    float bulletVelocity = 5000;
+    //[SerializeField]
     float size = 1;
-    [SerializeField]
-    float magazineSize;
-    [SerializeField]
-    float reloadSpeed;
-    [SerializeField]
-    float heatAmount;
-    [SerializeField]
-    float cooldownSpeed;
+    //[SerializeField]
+    float magazineSize = 1;
+    //[SerializeField]
+    float reloadSpeed = 10;
+    //[SerializeField]
+    float energy = 100;
+    //[SerializeField]
+    float cooldownSpeed = 10;
     [SerializeField]
     Slider damageSlider;
     [SerializeField]
     Slider fireRateSlider;
     [SerializeField]
     Slider accuracySlider;
-    [SerializeField]
-    Slider rangeSlider;
+    //[SerializeField]
+    //Slider distanceSlider;
     [SerializeField]
     Slider magazineSizeSlider;
     [SerializeField]
     Slider reloadSpeedSlider;
     [SerializeField]
-    Slider projectileVelocitySlider;
+    Slider bulletVelocitySlider;
+    //[SerializeField]
+    //Slider projectileWidthSlider;
     [SerializeField]
-    Slider projectileWidthSlider;
+    Slider rangeSlider;
     [SerializeField]
-    Slider damageFallOffSlider;
+    Slider energySlider;
+    [SerializeField]
+    Slider cooldownSpeedSlider;
     [SerializeField]
     bool usesOverheat;
     [SerializeField]
     bool usesReload;
 
-    public float damage;
-    public float range;
-    public float damageFallOff;
-    public bool bulletDropOn;
-    public float bulletDrop;
-    public bool AoEOn;
-    public float AoESize;
-
+    [HideInInspector]
+    public float damage = 1;
+    [HideInInspector]
+    public float distance = 40;
+    [HideInInspector]
+    public float range = 0;
+    [HideInInspector]
+    public float bulletDrop = 100;
+    [HideInInspector]
+    public float AoESize = 1;
     [HideInInspector]
     public Vector3 rangeEndPoint;
     [HideInInspector]
     public bool canFire;
 
-    enum gunType { Auto = 0, SemiAuto = 1, Lazer = 2 }
+    public bool bulletDropOn;
+    public bool AoEOn;
+
+    enum gunType { Auto = 0, SemiAuto = 1, Lazer = 2, Bow = 3, Launcher = 4 }
     float nextFireTime;
     float currentMagazineCount;
     bool isReloading;
     float currentHeat;
     bool isCoolingDown;
-    float maximumHeat = 1000;
+    bool isReducingHeat;
+    float maximumHeat = 100;
     float cooldownPauseTime = 0.5f;
 
     void Start()
@@ -80,34 +90,86 @@ public class ShootProjectile : MonoBehaviour
         canFire = true;
         currentHeat = 0;
         isCoolingDown = false;
+        isReducingHeat = false;
         overheatSlider.maxValue = maximumHeat;
         overheatSlider.value = currentHeat;
         overheatSlider.transform.GetChild(1).GetComponentInChildren<Image>().color = Color.white;
 
-        damageSlider.value = FindHalfwayPoint(damageSlider.minValue, damageSlider.maxValue);
-        fireRateSlider.value = FindHalfwayPoint(fireRateSlider.minValue, fireRateSlider.maxValue);
-        accuracySlider.value = FindHalfwayPoint(accuracySlider.minValue, accuracySlider.maxValue);
-        rangeSlider.value = FindHalfwayPoint(rangeSlider.minValue, rangeSlider.maxValue);
-        magazineSizeSlider.value = FindHalfwayPoint(magazineSizeSlider.minValue, magazineSizeSlider.maxValue);
-        reloadSpeedSlider.value = FindHalfwayPoint(reloadSpeedSlider.minValue, reloadSpeedSlider.maxValue);
-        projectileVelocitySlider.value = FindHalfwayPoint(projectileVelocitySlider.minValue, projectileVelocitySlider.maxValue);
-        projectileWidthSlider.value = FindHalfwayPoint(projectileWidthSlider.minValue, projectileWidthSlider.maxValue);
-        damageFallOffSlider.value = FindHalfwayPoint(damageFallOffSlider.minValue, damageFallOffSlider.maxValue);
+        if (damageSlider != null)
+        {
+            damageSlider.value = FindHalfwayPoint(damageSlider.minValue, damageSlider.maxValue);
+            damage = damageSlider.value;
+        }
 
-        damage = damageSlider.value;
-        fireRate = fireRateSlider.value;
-        accuracy = accuracySlider.value;
-        range = rangeSlider.value;
-        magazineSize = magazineSizeSlider.value;
-        reloadSpeed = reloadSpeedSlider.value;
-        velocity = projectileVelocitySlider.value;
-        size = projectileWidthSlider.value;
-        damageFallOff = damageFallOffSlider.value;
+        if (fireRateSlider != null)
+        {
+            fireRateSlider.value = FindHalfwayPoint(fireRateSlider.minValue, fireRateSlider.maxValue);
+            fireRate = fireRateSlider.value;
+        }
+
+        if (accuracySlider != null)
+        {
+            accuracySlider.value = FindHalfwayPoint(accuracySlider.minValue, accuracySlider.maxValue);
+            accuracy = accuracySlider.value;
+        }
+
+        /*if (distanceSlider != null)
+        {
+            distanceSlider.value = FindHalfwayPoint(distanceSlider.minValue, distanceSlider.maxValue);
+            distance = distanceSlider.value;
+        }*/
+
+        if (magazineSizeSlider != null)
+        {
+            magazineSizeSlider.value = FindHalfwayPoint(magazineSizeSlider.minValue, magazineSizeSlider.maxValue);
+            magazineSize = magazineSizeSlider.value;
+        }
+
+        if (reloadSpeedSlider != null)
+        {
+            reloadSpeedSlider.value = FindHalfwayPoint(reloadSpeedSlider.minValue, reloadSpeedSlider.maxValue);
+            reloadSpeed = reloadSpeedSlider.value;
+        }
+
+        if (bulletVelocitySlider != null)
+        {
+            bulletVelocitySlider.value = FindHalfwayPoint(bulletVelocitySlider.minValue, bulletVelocitySlider.maxValue);
+            bulletVelocity = bulletVelocitySlider.value;
+        }
+
+        /*if (projectileWidthSlider != null)
+        {
+            projectileWidthSlider.value = FindHalfwayPoint(projectileWidthSlider.minValue, projectileWidthSlider.maxValue);
+            size = projectileWidthSlider.value;
+        }*/
+
+        if (rangeSlider != null)
+        {
+            rangeSlider.value = FindHalfwayPoint(rangeSlider.minValue, rangeSlider.maxValue);
+            range = rangeSlider.value;
+        }
+
+        if (energySlider != null)
+        {
+            energySlider.value = FindHalfwayPoint(energySlider.minValue, energySlider.maxValue);
+            energy = energySlider.value;
+        }
+
+        if (cooldownSpeedSlider != null)
+        {
+            cooldownSpeedSlider.value = FindHalfwayPoint(cooldownSpeedSlider.minValue, cooldownSpeedSlider.maxValue);
+            cooldownSpeed = cooldownSpeedSlider.value;
+        }
     }
 
-    void FixedUpdate()
+    void Update()
     {
         FireProjectile();
+
+        if (isCoolingDown || isReducingHeat)
+        {
+            Overheat();
+        }
     }
 
     void FireProjectile()
@@ -126,15 +188,15 @@ public class ShootProjectile : MonoBehaviour
                     RaycastHit rayHit;
                     Ray lookRay = new Ray(rayStart, playerCamera.transform.forward);
                     
-                    rangeEndPoint = lookRay.GetPoint(range);
+                    rangeEndPoint = lookRay.GetPoint(distance);
 
-                    if (Physics.Raycast(lookRay, out rayHit, range) && rayHit.collider.tag != "Damager")
+                    if (Physics.Raycast(lookRay, out rayHit, distance) && rayHit.collider.tag != "Damager")
                     {
                         transform.parent.LookAt(rayHit.point);
                     }
                     else
                     {
-                        transform.parent.LookAt(lookRay.GetPoint(range));
+                        transform.parent.LookAt(lookRay.GetPoint(distance));
                     }
 
                     float xRand = Random.Range(0, accuracy);
@@ -147,8 +209,8 @@ public class ShootProjectile : MonoBehaviour
                     bullet.transform.localScale = new Vector3(bullet.transform.localScale.x * size, bullet.transform.localScale.y * size, bullet.transform.localScale.z * size);
 
                     bullet.GetComponent<ProjectileBehavior>().projectileDamage = damage;
-                    bullet.GetComponent<ProjectileBehavior>().projectileRange = range;
-                    bullet.GetComponent<ProjectileBehavior>().projectileDamageFallOff = damageFallOff;
+                    bullet.GetComponent<ProjectileBehavior>().projectileRange = distance;
+                    bullet.GetComponent<ProjectileBehavior>().projectileDamageFallOff = range;
                     bullet.GetComponent<ProjectileBehavior>().projectileEndPoint = rangeEndPoint;
 
                     if (bulletDropOn)
@@ -164,23 +226,24 @@ public class ShootProjectile : MonoBehaviour
                     }
 
 
-                    bullet.AddForce(transform.forward * velocity);
+                    bullet.AddForce(transform.forward * bulletVelocity);
 
                     if (usesOverheat)
                     {
-                        currentHeat += heatAmount;
+                        currentHeat += energy;
                         overheatSlider.value = currentHeat;
 
                         if (currentHeat >= maximumHeat)
                         {
                             currentHeat = maximumHeat;
                             StopAllCoroutines();
-                            StartCoroutine(Cooldown());
+                            StartCoroutine(Cooldown(true));
                         }
-                        else if (currentHeat < maximumHeat && !isCoolingDown)
+                        else if (currentHeat < maximumHeat)
                         {
+                            isReducingHeat = false;
                             StopAllCoroutines();
-                            StartCoroutine(ReduceHeat());
+                            StartCoroutine(Cooldown(false));
                         }
                     }
                     
@@ -204,6 +267,12 @@ public class ShootProjectile : MonoBehaviour
         }
     }
 
+    void Overheat()
+    {
+        currentHeat -= maximumHeat / (cooldownSpeed / Time.deltaTime);
+        overheatSlider.value = currentHeat;
+    }
+
     IEnumerator Reload()
     {
         reloadSlider.maxValue = reloadSpeed;
@@ -221,47 +290,33 @@ public class ShootProjectile : MonoBehaviour
         isReloading = false;
     }
 
-    IEnumerator Cooldown()
+    IEnumerator Cooldown(bool fullHeat)
     {
-        isCoolingDown = true;
-        overheatSlider.transform.GetChild(1).GetComponentInChildren<Image>().color = Color.red;
-        float timeInterval = 0.1f;
-        float loopStart = currentHeat;
-        float reduceHeatIncrement = maximumHeat / (cooldownSpeed / timeInterval);
-        yield return new WaitForSeconds(cooldownPauseTime);
-        float time1 = Time.time;
+        if (fullHeat)
+            overheatSlider.transform.GetChild(1).GetComponentInChildren<Image>().color = Color.red;
 
-        for (float i = 0; i < loopStart; i += reduceHeatIncrement)
-        {
-            currentHeat -= reduceHeatIncrement;
-            overheatSlider.value = currentHeat;
-            yield return new WaitForSeconds(timeInterval);
-        float time2 = time1 - Time.time;
-        print(time2);
-        }
+        yield return new WaitForSeconds(cooldownPauseTime);
+
+        if (fullHeat)
+            isCoolingDown = true;
+
+        if (!fullHeat)
+            isReducingHeat = true;
+
+        float amountToCoolDown = currentHeat / maximumHeat * cooldownSpeed;
+        yield return new WaitForSeconds(amountToCoolDown);
 
         currentHeat = 0;
-        overheatSlider.transform.GetChild(1).GetComponentInChildren<Image>().color = Color.white;
-        overheatSlider.maxValue = maximumHeat;
         overheatSlider.value = currentHeat;
-        isCoolingDown = false;
-    }
 
-    IEnumerator ReduceHeat()
-    {
-        yield return new WaitForSeconds(cooldownPauseTime);
-        float timeInterval = 0.1f;
-        float loopStart = currentHeat;
-        float reduceHeatIncrement = maximumHeat / (cooldownSpeed / timeInterval);
-        float time1 = Time.time;
-        for (float i = 0; i < loopStart; i += reduceHeatIncrement)
+        if (fullHeat)
         {
-            currentHeat -= reduceHeatIncrement;
-            overheatSlider.value = currentHeat;
-            yield return new WaitForSeconds(timeInterval);
+            overheatSlider.transform.GetChild(1).GetComponentInChildren<Image>().color = Color.white;
+            isCoolingDown = false;
         }
-        float time2 = time1 - Time.time;
-        print(time2);
+
+        if (!fullHeat)
+            isReducingHeat = false;
     }
 
     public void ChangeDamage()
@@ -279,9 +334,9 @@ public class ShootProjectile : MonoBehaviour
         accuracy = accuracySlider.value;
     }
 
-    public void ChangeRange()
+    public void ChangeDistance()
     {
-        range = rangeSlider.value;
+        //distance = distanceSlider.value;
     }
 
     public void ChangeMagazineSize()
@@ -294,19 +349,29 @@ public class ShootProjectile : MonoBehaviour
         reloadSpeed = reloadSpeedSlider.value;
     }
 
-    public void ChangeProjectileVelocity()
+    public void ChangeBulletVelocity()
     {
-        velocity = projectileVelocitySlider.value;
+        bulletVelocity = bulletVelocitySlider.value;
     }
 
     public void ChangeProjectileWidth()
     {
-        size = projectileWidthSlider.value;
+        //size = projectileWidthSlider.value;
     }
 
-    public void ChangeDamageFallOff()
+    public void ChangeRange()
     {
-        damageFallOff = damageFallOffSlider.value;
+        range = rangeSlider.value;
+    }
+
+    public void ChangeEnergy()
+    {
+        energy = energySlider.value;
+    }
+
+    public void ChangeCooldownSpeed()
+    {
+        cooldownSpeed = cooldownSpeedSlider.value;
     }
 
     float FindHalfwayPoint(float min, float max)
