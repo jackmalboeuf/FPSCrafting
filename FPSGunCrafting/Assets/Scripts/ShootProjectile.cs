@@ -9,6 +9,8 @@ public class ShootProjectile : MonoBehaviour
     [SerializeField]
     Rigidbody projectile;
     [SerializeField]
+    Camera playerCamera;
+    [SerializeField]
     Slider reloadSlider;
     [SerializeField]
     Slider overheatSlider;
@@ -220,8 +222,6 @@ public class ShootProjectile : MonoBehaviour
                 if (currentMagazineCount > 0 && currentHeat < maximumHeat)
                 {
                     nextFireTime = Time.time + fireRate;
-
-                    Camera playerCamera = transform.parent.parent.GetComponent<Camera>();
 
                     Vector3 rayStart = playerCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0));
                     RaycastHit rayHit;
