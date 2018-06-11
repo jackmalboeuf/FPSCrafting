@@ -299,10 +299,13 @@
     <Compile Include="Assets\Scripts\CursorLock.cs" />
     <Compile Include="Assets\Scripts\Damagable.cs" />
     <Compile Include="Assets\Scripts\DestroyAfterTime.cs" />
+    <Compile Include="Assets\Scripts\DropdownBehavior.cs" />
+    <Compile Include="Assets\Scripts\DropdownItemDisable.cs" />
     <Compile Include="Assets\Scripts\FaceTowardObject.cs" />
     <Compile Include="Assets\Scripts\Inventory.cs" />
     <Compile Include="Assets\Scripts\ObjectLookInteract.cs" />
     <Compile Include="Assets\Scripts\PickupObject.cs" />
+    <Compile Include="Assets\Scripts\PlayerAnimation.cs" />
     <Compile Include="Assets\Scripts\PlayerMovement.cs" />
     <Compile Include="Assets\Scripts\PreventCollisionPassThrough.cs" />
     <Compile Include="Assets\Scripts\ProjectileBehavior.cs" />

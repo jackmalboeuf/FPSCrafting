@@ -33,6 +33,22 @@ public class ShootProjectile : MonoBehaviour
     [SerializeField]
     Slider reloadSpeedSlider;
     [SerializeField]
+    Slider zoomDistanceSlider;
+    [SerializeField]
+    Slider meleeDamageSlider;
+    [SerializeField]
+    Slider trait1aSlider;
+    [SerializeField]
+    Slider trait1bSlider;
+    [SerializeField]
+    Slider trait1cSlider;
+    [SerializeField]
+    Slider trait2aSlider;
+    [SerializeField]
+    Slider trait2bSlider;
+    [SerializeField]
+    Slider trait2cSlider;
+    [SerializeField]
     Text damageValueText;
     [SerializeField]
     Text fireRateValueText;
@@ -50,6 +66,28 @@ public class ShootProjectile : MonoBehaviour
     Text magazineSizeValueText;
     [SerializeField]
     Text reloadSpeedValueText;
+    [SerializeField]
+    Text zoomDistanceValueText;
+    [SerializeField]
+    Text meleeDamageValueText;
+    [SerializeField]
+    Text trait1aValueText;
+    [SerializeField]
+    Text trait1bValueText;
+    [SerializeField]
+    Text trait1cValueText;
+    [SerializeField]
+    Text trait2aValueText;
+    [SerializeField]
+    Text trait2bValueText;
+    [SerializeField]
+    Text trait2cValueText;
+    [SerializeField]
+    Dropdown alternateAttackDropdown;
+    [SerializeField]
+    Dropdown trait1Dropdown;
+    [SerializeField]
+    Dropdown trait2Dropdown;
     [SerializeField]
     bool usesOverheat;
     [SerializeField]
@@ -69,6 +107,8 @@ public class ShootProjectile : MonoBehaviour
     public Vector3 rangeEndPoint;
     [HideInInspector]
     public bool canFire;
+    [HideInInspector]
+    public float zoomDistance = 15;
 
     public bool bulletDropOn;
     public bool AoEOn;
@@ -82,6 +122,9 @@ public class ShootProjectile : MonoBehaviour
     float reloadSpeed = 10;
     float energy = 100;
     float cooldownSpeed = 10;
+    float meleeDamage = 500;
+    float timeToFullSpeed = 10;
+    float numberOfBullets = 1;
     float nextFireTime;
     float currentMagazineCount;
     bool isReloading;
@@ -103,103 +146,106 @@ public class ShootProjectile : MonoBehaviour
         overheatSlider.value = currentHeat;
         overheatSlider.transform.GetChild(1).GetComponentInChildren<Image>().color = Color.white;
 
-        if (damageSlider != null)
+        if (damageSlider != null && damageValueText != null)
         {
             damageSlider.value = FindHalfwayPoint(damageSlider.minValue, damageSlider.maxValue);
-            damage = damageSlider.value;
+            ChangeDamage();
         }
 
-        if (fireRateSlider != null)
+        if (fireRateSlider != null && fireRateValueText != null)
         {
             fireRateSlider.value = FindHalfwayPoint(fireRateSlider.minValue, fireRateSlider.maxValue);
-            fireRate = fireRateSlider.value;
+            ChangeFireRate();
         }
 
-        if (rangeSlider != null)
+        if (rangeSlider != null && rangeValueText != null)
         {
             rangeSlider.value = FindHalfwayPoint(rangeSlider.minValue, rangeSlider.maxValue);
-            range = rangeSlider.value;
+            ChangeRange();
         }
 
-        if (accuracySlider != null)
+        if (accuracySlider != null && accuracyValueText != null)
         {
             accuracySlider.value = FindHalfwayPoint(accuracySlider.minValue, accuracySlider.maxValue);
-            accuracy = accuracySlider.value;
+            ChangeAccuracy();
         }
 
-        if (energySlider != null)
+        if (energySlider != null && energyValueText != null)
         {
             energySlider.value = FindHalfwayPoint(energySlider.minValue, energySlider.maxValue);
-            energy = energySlider.value;
+            ChangeEnergy();
         }
 
-        if (cooldownSpeedSlider != null)
+        if (cooldownSpeedSlider != null && cooldownSpeedValueText != null)
         {
             cooldownSpeedSlider.value = FindHalfwayPoint(cooldownSpeedSlider.minValue, cooldownSpeedSlider.maxValue);
-            cooldownSpeed = cooldownSpeedSlider.value;
+            ChangeCooldownSpeed();
         }
 
-        if (bulletVelocitySlider != null)
+        if (bulletVelocitySlider != null && bulletVelocityValueText != null)
         {
             bulletVelocitySlider.value = FindHalfwayPoint(bulletVelocitySlider.minValue, bulletVelocitySlider.maxValue);
-            bulletVelocity = bulletVelocitySlider.value;
+            ChangeBulletVelocity();
         }
 
-        if (magazineSizeSlider != null)
+        if (magazineSizeSlider != null && magazineSizeValueText != null)
         {
             magazineSizeSlider.value = FindHalfwayPoint(magazineSizeSlider.minValue, magazineSizeSlider.maxValue);
-            magazineSize = magazineSizeSlider.value;
+            ChangeMagazineSize();
         }
 
-        if (reloadSpeedSlider != null)
+        if (reloadSpeedSlider != null && reloadSpeedValueText != null)
         {
             reloadSpeedSlider.value = FindHalfwayPoint(reloadSpeedSlider.minValue, reloadSpeedSlider.maxValue);
-            reloadSpeed = reloadSpeedSlider.value;
+            ChangeReloadSpeed();
         }
 
-        if (damageValueText != null)
+        if (zoomDistanceSlider != null && zoomDistanceValueText != null)
         {
-            damageValueText.text = damage.ToString();
+            zoomDistanceSlider.value = FindHalfwayPoint(zoomDistanceSlider.minValue, zoomDistanceSlider.maxValue);
+            ChangeZoomDistance();
         }
 
-        if (fireRateValueText != null)
+        if (meleeDamageSlider != null && meleeDamageValueText != null)
         {
-            fireRateValueText.text = (Mathf.Round(100 * fireRate) / 100).ToString();
+            meleeDamageSlider.value = FindHalfwayPoint(meleeDamageSlider.minValue, meleeDamageSlider.maxValue);
+            ChangeMeleeDamage();
         }
 
-        if (rangeValueText != null)
+        if (trait1aSlider != null && trait1aValueText != null)
         {
-            rangeValueText.text = range.ToString();
+            trait1aSlider.value = FindHalfwayPoint(trait1aSlider.minValue, trait1aSlider.maxValue);
+            ChangeTrait1a();
         }
 
-        if (accuracyValueText != null)
+        if (trait1bSlider != null && trait1bValueText != null)
         {
-            accuracyValueText.text = (Mathf.Round(100 * accuracy) / 100).ToString();
+            trait1bSlider.value = FindHalfwayPoint(trait1bSlider.minValue, trait1bSlider.maxValue);
+            ChangeTrait1b();
         }
 
-        if (energyValueText != null)
+        if (trait1cSlider != null && trait1cValueText != null)
         {
-            energyValueText.text = energy.ToString();
+            trait1cSlider.value = FindHalfwayPoint(trait1cSlider.minValue, trait1cSlider.maxValue);
+            ChangeTrait1c();
         }
 
-        if (cooldownSpeedValueText != null)
+        if (trait2aSlider != null && trait2aValueText != null)
         {
-            cooldownSpeedValueText.text = (Mathf.Round(100 * cooldownSpeed) / 100).ToString();
+            trait2aSlider.value = FindHalfwayPoint(trait2aSlider.minValue, trait2aSlider.maxValue);
+            ChangeTrait2a();
         }
 
-        if (bulletVelocityValueText != null)
+        if (trait2bSlider != null && trait2bValueText != null)
         {
-            bulletVelocityValueText.text = bulletVelocity.ToString();
+            trait2bSlider.value = FindHalfwayPoint(trait2bSlider.minValue, trait2bSlider.maxValue);
+            ChangeTrait2b();
         }
 
-        if (magazineSizeValueText != null)
+        if (trait2cSlider != null && trait2cValueText != null)
         {
-            magazineSizeValueText.text = magazineSize.ToString();
-        }
-
-        if (reloadSpeedValueText != null)
-        {
-            reloadSpeedValueText.text = reloadSpeed.ToString();
+            trait2cSlider.value = FindHalfwayPoint(trait2cSlider.minValue, trait2cSlider.maxValue);
+            ChangeTrait2c();
         }
     }
 
@@ -411,6 +457,72 @@ public class ShootProjectile : MonoBehaviour
     {
         reloadSpeed = reloadSpeedSlider.value;
         reloadSpeedValueText.text = reloadSpeed.ToString();
+    }
+
+    public void ChangeZoomDistance()
+    {
+        zoomDistance = zoomDistanceSlider.value;
+        zoomDistanceValueText.text = zoomDistance.ToString();
+    }
+
+    public void ChangeMeleeDamage()
+    {
+        meleeDamage = meleeDamageSlider.value;
+        meleeDamageValueText.text = meleeDamage.ToString();
+    }
+
+    public void ChangeTrait1a()
+    {
+        if (typeOfGun == gunType.Auto)
+        {
+            AoESize = trait1aSlider.value;
+            trait1aValueText.text = (Mathf.Round(100 * AoESize) / 100).ToString();
+        }
+    }
+
+    public void ChangeTrait1b()
+    {
+        if (typeOfGun == gunType.Auto)
+        {
+            timeToFullSpeed = trait1bSlider.value;
+            trait1bValueText.text = (Mathf.Round(100 * timeToFullSpeed) / 100).ToString();
+        }
+    }
+
+    public void ChangeTrait1c()
+    {
+        if (typeOfGun == gunType.Auto)
+        {
+            numberOfBullets = trait1cSlider.value;
+            trait1cValueText.text = numberOfBullets.ToString();
+        }
+    }
+
+    public void ChangeTrait2a()
+    {
+        if (typeOfGun == gunType.Auto)
+        {
+            AoESize = trait2aSlider.value;
+            trait2aValueText.text = (Mathf.Round(100 * AoESize) / 100).ToString();
+        }
+    }
+
+    public void ChangeTrait2b()
+    {
+        if (typeOfGun == gunType.Auto)
+        {
+            timeToFullSpeed = trait2bSlider.value;
+            trait2bValueText.text = (Mathf.Round(100 * timeToFullSpeed) / 100).ToString();
+        }
+    }
+
+    public void ChangeTrait2c()
+    {
+        if (typeOfGun == gunType.Auto)
+        {
+            numberOfBullets = trait2cSlider.value;
+            trait2cValueText.text = numberOfBullets.ToString();
+        }
     }
 
     float FindHalfwayPoint(float min, float max)

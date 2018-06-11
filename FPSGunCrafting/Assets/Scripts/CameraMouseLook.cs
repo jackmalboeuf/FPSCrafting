@@ -6,12 +6,12 @@ public class CameraMouseLook : MonoBehaviour
     enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
 
     [SerializeField] RotationAxes axes = RotationAxes.MouseXAndY;
-    [SerializeField] float sensitivityX = 15F;
-    [SerializeField] float sensitivityY = 15F;
+    public float sensitivityX = 3F;
+    public float sensitivityY = 3F;
     [SerializeField] float minimumX = -360F;
     [SerializeField] float maximumX = 360F;
-    [SerializeField] float minimumY = -60F;
-    [SerializeField] float maximumY = 60F;
+    [SerializeField] float minimumY = -90F;
+    [SerializeField] float maximumY = 90F;
 
     float rotationX = 0F;
     float rotationY = 0F;
