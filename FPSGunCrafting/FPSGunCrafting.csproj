@@ -295,6 +295,7 @@
     <Compile Include="Assets\Scripts\ActivateOnButtonPress.cs" />
     <Compile Include="Assets\Scripts\AoEDamage.cs" />
     <Compile Include="Assets\Scripts\CameraMouseLook.cs" />
+    <Compile Include="Assets\Scripts\ChangeAltAttack.cs" />
     <Compile Include="Assets\Scripts\CheckInventoryItems.cs" />
     <Compile Include="Assets\Scripts\CursorLock.cs" />
     <Compile Include="Assets\Scripts\Damagable.cs" />
@@ -303,6 +304,7 @@
     <Compile Include="Assets\Scripts\DropdownItemDisable.cs" />
     <Compile Include="Assets\Scripts\FaceTowardObject.cs" />
     <Compile Include="Assets\Scripts\Inventory.cs" />
+    <Compile Include="Assets\Scripts\MeleeColliderDamage.cs" />
     <Compile Include="Assets\Scripts\ObjectLookInteract.cs" />
     <Compile Include="Assets\Scripts\PickupObject.cs" />
     <Compile Include="Assets\Scripts\PlayerAnimation.cs" />

@@ -1,0 +1,259 @@
+fileFormatVersion: 2
+guid: 10161e3868e56164c91e44673403176b
+timeCreated: 1528902371
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: GunHolder
+    100002: joint1
+    100004: joint2
+    100006: joint2 1
+    100008: joint3
+    100010: joint3 1
+    100012: joint4
+    100014: joint4 1
+    100016: joint5
+    100018: joint5 1
+    100020: joint6
+    100022: joint6 1
+    100024: joint7
+    100026: joint7 1
+    100028: joint8
+    100030: joint9
+    100032: nurbsCircle1
+    100034: nurbsCircle2
+    100036: nurbsCircle2 1
+    100038: nurbsCircle3
+    100040: nurbsCircle3 1
+    100042: nurbsCircle4
+    100044: nurbsCircle4 1
+    100046: nurbsCircle5
+    100048: nurbsCircle5 1
+    100050: nurbsCircle6
+    100052: nurbsCircle6 1
+    100054: nurbsCircle7
+    100056: nurbsCircle7 1
+    100058: nurbsCircle8
+    100060: nurbsCircle9
+    100062: pCube16
+    100064: pCube16 1
+    100066: pCube17
+    100068: pCube17 1
+    100070: pCube18
+    100072: pCube18 1
+    100074: pCube19
+    100076: pCube19 1
+    100078: pCylinder1
+    100080: pCylinder1 1
+    100082: pCylinder5
+    100084: pCylinder5 1
+    100086: Pistol
+    100088: //RootNode
+    100090: pSphere5
+    100092: pSphere5 1
+    400000: GunHolder
+    400002: joint1
+    400004: joint2
+    400006: joint2 1
+    400008: joint3
+    400010: joint3 1
+    400012: joint4
+    400014: joint4 1
+    400016: joint5
+    400018: joint5 1
+    400020: joint6
+    400022: joint6 1
+    400024: joint7
+    400026: joint7 1
+    400028: joint8
+    400030: joint9
+    400032: nurbsCircle1
+    400034: nurbsCircle2
+    400036: nurbsCircle2 1
+    400038: nurbsCircle3
+    400040: nurbsCircle3 1
+    400042: nurbsCircle4
+    400044: nurbsCircle4 1
+    400046: nurbsCircle5
+    400048: nurbsCircle5 1
+    400050: nurbsCircle6
+    400052: nurbsCircle6 1
+    400054: nurbsCircle7
+    400056: nurbsCircle7 1
+    400058: nurbsCircle8
+    400060: nurbsCircle9
+    400062: pCube16
+    400064: pCube16 1
+    400066: pCube17
+    400068: pCube17 1
+    400070: pCube18
+    400072: pCube18 1
+    400074: pCube19
+    400076: pCube19 1
+    400078: pCylinder1
+    400080: pCylinder1 1
+    400082: pCylinder5
+    400084: pCylinder5 1
+    400086: Pistol
+    400088: //RootNode
+    400090: pSphere5
+    400092: pSphere5 1
+    2300000: pCube16
+    2300002: pCube16 1
+    2300004: pCube17
+    2300006: pCube17 1
+    2300008: pCube18
+    2300010: pCube18 1
+    2300012: pCube19
+    2300014: pCube19 1
+    2300016: pCylinder1
+    2300018: pCylinder1 1
+    2300020: pCylinder5
+    2300022: pCylinder5 1
+    2300024: Pistol
+    2300026: pSphere5
+    2300028: pSphere5 1
+    3300000: pCube16
+    3300002: pCube16 1
+    3300004: pCube17
+    3300006: pCube17 1
+    3300008: pCube18
+    3300010: pCube18 1
+    3300012: pCube19
+    3300014: pCube19 1
+    3300016: pCylinder1
+    3300018: pCylinder1 1
+    3300020: pCylinder5
+    3300022: pCylinder5 1
+    3300024: Pistol
+    3300026: pSphere5
+    3300028: pSphere5 1
+    4300000: pCube19
+    4300002: pCube18
+    4300004: pCube17
+    4300006: pSphere5
+    4300008: pCube16
+    4300010: pCylinder5
+    4300012: pCylinder1
+    4300014: pCube19
+    4300016: pCube18
+    4300018: pCube17
+    4300020: pSphere5
+    4300022: pCube16
+    4300024: Pistol
+    4300026: pCylinder5
+    4300028: pCylinder1
+    7400000: Pistol
+    9500000: //RootNode
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert1
+    second: {fileID: 2100000, guid: 83980a753ff3b874eb27a1ff05dc6eed, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Pistol
+      takeName: Take 001
+      firstFrame: 210
+      lastFrame: 300
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 25
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -4,8 +4,7 @@ using UnityEngine.UI;
 
 public class ShootProjectile : MonoBehaviour
 {
-    [SerializeField]
-    gunType typeOfGun = gunType.Auto;
+    public gunType typeOfGun = gunType.Auto;
     [SerializeField]
     Rigidbody projectile;
     [SerializeField]
@@ -109,11 +108,14 @@ public class ShootProjectile : MonoBehaviour
     public bool canFire;
     [HideInInspector]
     public float zoomDistance = 15;
+    [HideInInspector]
+    public float meleeDamage = 500;
+    [HideInInspector]
+    public enum gunType { Auto = 0, SemiAuto = 1, Lazer = 2, Bow = 3, Launcher = 4 }
 
     public bool bulletDropOn;
     public bool AoEOn;
 
-    enum gunType { Auto = 0, SemiAuto = 1, Lazer = 2, Bow = 3, Launcher = 4 }
     float fireRate = 0.3f;
     float accuracy = 5;
     float bulletVelocity = 5000;
@@ -122,7 +124,6 @@ public class ShootProjectile : MonoBehaviour
     float reloadSpeed = 10;
     float energy = 100;
     float cooldownSpeed = 10;
-    float meleeDamage = 500;
     float timeToFullSpeed = 10;
     float numberOfBullets = 1;
     float nextFireTime;
