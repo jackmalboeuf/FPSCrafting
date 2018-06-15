@@ -115,7 +115,7 @@ public class ShootProjectile : MonoBehaviour
 
     public bool bulletDropOn;
     public bool AoEOn;
-
+    
     float fireRate = 0.3f;
     float accuracy = 5;
     float bulletVelocity = 5000;
@@ -523,6 +523,21 @@ public class ShootProjectile : MonoBehaviour
         {
             numberOfBullets = trait2cSlider.value;
             trait2cValueText.text = numberOfBullets.ToString();
+        }
+    }
+
+    public void ChangeTrait1Dropdown()
+    {
+        if (typeOfGun == gunType.Auto)
+        {
+            if (trait1Dropdown.value == 1)
+            {
+                AoEOn = true;
+            }
+            else if (trait1Dropdown.value == 2)
+            {
+
+            }
         }
     }
 
