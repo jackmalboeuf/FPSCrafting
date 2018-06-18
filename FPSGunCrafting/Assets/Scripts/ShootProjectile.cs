@@ -10,6 +10,10 @@ public class ShootProjectile : MonoBehaviour
     [SerializeField]
     Camera playerCamera;
     [SerializeField]
+    string fireButton;
+    [SerializeField]
+    string reloadButton;
+    [SerializeField]
     Slider reloadSlider;
     [SerializeField]
     Slider overheatSlider;
@@ -93,6 +97,8 @@ public class ShootProjectile : MonoBehaviour
     bool usesReload;
 
     [HideInInspector]
+    public enum gunType { Auto = 0, SemiAuto = 1, Lazer = 2, Bow = 3, Launcher = 4 }
+    [HideInInspector]
     public float damage = 1;
     [HideInInspector]
     public float distance = 40;
@@ -111,10 +117,9 @@ public class ShootProjectile : MonoBehaviour
     [HideInInspector]
     public float meleeDamage = 500;
     [HideInInspector]
-    public enum gunType { Auto = 0, SemiAuto = 1, Lazer = 2, Bow = 3, Launcher = 4 }
-
-    public bool bulletDropOn;
-    public bool AoEOn;
+    public bool AoEOn = false;
+    [HideInInspector]
+    public bool bulletDropOn = false;
     
     float fireRate = 0.3f;
     float accuracy = 5;
@@ -125,6 +130,7 @@ public class ShootProjectile : MonoBehaviour
     float energy = 100;
     float cooldownSpeed = 10;
     float timeToFullSpeed = 10;
+    float rapidFireMultiplier = 1.5f;
     float numberOfBullets = 1;
     float nextFireTime;
     float currentMagazineCount;
@@ -134,6 +140,9 @@ public class ShootProjectile : MonoBehaviour
     bool isReducingHeat;
     float maximumHeat = 100;
     float cooldownPauseTime = 0.5f;
+    bool rapidFireOn = false;
+    bool bulletSpreadOn = false;
+    float rapidFireTimePassed = 0;
 
     void Start()
     {
@@ -264,7 +273,7 @@ public class ShootProjectile : MonoBehaviour
     {
         if (typeOfGun == gunType.Auto)
         {
-            if (Input.GetButton("Fire1") && Time.time > nextFireTime && !isReloading && canFire && !isCoolingDown)
+            if (Input.GetButton(fireButton) && Time.time > nextFireTime && !isReloading && canFire && !isCoolingDown)
             {
                 if (currentMagazineCount > 0 && currentHeat < maximumHeat)
                 {
@@ -311,6 +320,15 @@ public class ShootProjectile : MonoBehaviour
                         bullet.GetComponent<ProjectileBehavior>().projectileAoEOn = AoEOn;
                     }
 
+                    if (rapidFireOn)
+                    {
+                        //StartCoroutine(RapidFire());
+                    }
+
+                    if (bulletSpreadOn)
+                    {
+
+                    }
 
                     bullet.AddForce(transform.forward * bulletVelocity);
 
@@ -348,7 +366,7 @@ public class ShootProjectile : MonoBehaviour
             }
         }
 
-        if (Input.GetButtonDown("Reload") && !isReloading && currentMagazineCount < magazineSize && usesReload)
+        if (Input.GetButtonDown(reloadButton) && !isReloading && currentMagazineCount < magazineSize && usesReload)
         {
             StartCoroutine(Reload());
         }
@@ -405,6 +423,24 @@ public class ShootProjectile : MonoBehaviour
         if (!fullHeat)
             isReducingHeat = false;
     }
+
+    /*IEnumerator RapidFire()
+    {
+        bool hasBeenFiring = false;
+
+        if (Input.GetButton(fireButton))
+        {
+            hasBeenFiring = true;
+            rapidFireTimePassed += 0.5f;
+            fireRate = fireRate * (1 + rapidFireTimePassed) * rapidFireMultiplier;
+            yield return new WaitForSeconds(0.5f);
+        }
+        else
+        {
+            hasBeenFiring = false;
+            rapidFireTimePassed = 0;
+        }
+    }*/
 
     public void ChangeDamage()
     {
@@ -530,13 +566,30 @@ public class ShootProjectile : MonoBehaviour
     {
         if (typeOfGun == gunType.Auto)
         {
-            if (trait1Dropdown.value == 1)
+            if (trait1Dropdown.value == 0)
+            {
+                AoEOn = false;
+                rapidFireOn = false;
+                bulletSpreadOn = false;
+                
+            }
+            else if (trait1Dropdown.value == 1)
             {
                 AoEOn = true;
+                rapidFireOn = false;
+                bulletSpreadOn = false;
             }
             else if (trait1Dropdown.value == 2)
             {
-
+                AoEOn = false;
+                rapidFireOn = true;
+                bulletSpreadOn = false;
+            }
+            else if (trait1Dropdown.value == 3)
+            {
+                AoEOn = false;
+                rapidFireOn = false;
+                bulletSpreadOn = true;
             }
         }
     }

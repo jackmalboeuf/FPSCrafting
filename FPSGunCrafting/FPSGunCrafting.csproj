@@ -399,6 +399,7 @@
     <Compile Include="Assets\Scripts\ProjectileBehavior.cs" />
     <Compile Include="Assets\Scripts\SetActiveStateOnStart.cs" />
     <Compile Include="Assets\Scripts\ShootProjectile.cs" />
+    <Compile Include="Assets\Scripts\SwitchMenuTabs.cs" />
     <Compile Include="Assets\Scripts\TeleportTrigger.cs" />
   </ItemGroup>
   <ItemGroup>
