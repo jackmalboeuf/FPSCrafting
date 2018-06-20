@@ -8,10 +8,12 @@ public class SwitchMenuTabs : MonoBehaviour
     [SerializeField]
     GameObject tuningPanel;
 
-    private void Start()
+    private void Update()
     {
-        if (GetComponent<Toggle>().isOn)
-            GetComponent<Image>().color = Color.white;
+        if (tuningPanel.activeSelf)
+        {
+            //GetComponent<Button>() = Color.white;
+        }
     }
 
     public void PressTabButton()

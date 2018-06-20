@@ -450,7 +450,7 @@ public class ShootProjectile : MonoBehaviour
 
     public void ChangeFireRate()
     {
-        fireRate = fireRateSlider.value;
+        fireRate = fireRateSlider.value / 1000;
         fireRateValueText.text = (Mathf.Round(100 * fireRate) / 100).ToString();
     }
 
@@ -462,7 +462,7 @@ public class ShootProjectile : MonoBehaviour
 
     public void ChangeAccuracy()
     {
-        accuracy = accuracySlider.value;
+        accuracy = accuracySlider.value / 100;
         accuracyValueText.text = (Mathf.Round(100 * accuracy) / 100).ToString();
     }
 
@@ -474,7 +474,7 @@ public class ShootProjectile : MonoBehaviour
 
     public void ChangeCooldownSpeed()
     {
-        cooldownSpeed = cooldownSpeedSlider.value;
+        cooldownSpeed = cooldownSpeedSlider.value / 10;
         cooldownSpeedValueText.text = (Mathf.Round(100 * cooldownSpeed) / 100).ToString();
     }
 

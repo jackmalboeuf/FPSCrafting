@@ -25,6 +25,8 @@ public class PlayerAnimation : MonoBehaviour
     GameObject meleeCollision;
     [SerializeField]
     Transform meleeHandle;
+    [SerializeField]
+    GameObject reticle;
 
     float scopedFOV;
     bool isScoped = false;
@@ -64,6 +66,7 @@ public class PlayerAnimation : MonoBehaviour
         weaponCamera.SetActive(false);
 
         scopedFOV = projectileSpawn.zoomDistance;
+        reticle.SetActive(false);
 
         playerMovement.GetComponent<CameraMouseLook>().sensitivityX = scopedSensitivity;
         playerMovement.transform.GetChild(0).GetComponent<CameraMouseLook>().sensitivityY = scopedSensitivity;
@@ -76,6 +79,7 @@ public class PlayerAnimation : MonoBehaviour
     {
         scopeOverlay.SetActive(false);
         weaponCamera.SetActive(true);
+        reticle.SetActive(true);
 
         mainCamera.fieldOfView = unscopedFOV;
     }
