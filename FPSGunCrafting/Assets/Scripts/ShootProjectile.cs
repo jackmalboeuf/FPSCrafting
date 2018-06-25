@@ -129,31 +129,29 @@ public class ShootProjectile : MonoBehaviour
     float reloadSpeed = 10;
     float energy = 100;
     float cooldownSpeed = 10;
-    float timeToFullSpeed = 10;
-    float rapidFireMultiplier = 1.5f;
+    float energyBoost = 1.25f;
     float numberOfBullets = 1;
     float nextFireTime;
     float currentMagazineCount;
     bool isReloading;
-    float currentHeat;
+    float currentEnergy;
     bool isCoolingDown;
-    bool isReducingHeat;
-    float maximumHeat = 100;
+    bool isReducingEnergy;
+    float maximumEnergy = 100;
     float cooldownPauseTime = 0.5f;
-    bool rapidFireOn = false;
+    bool energyBoostOn = false;
     bool bulletSpreadOn = false;
-    float rapidFireTimePassed = 0;
-
+    
     void Start()
     {
         isReloading = false;
         currentMagazineCount = magazineSize;
         canFire = true;
-        currentHeat = 0;
+        currentEnergy = 0;
         isCoolingDown = false;
-        isReducingHeat = false;
-        overheatSlider.maxValue = maximumHeat;
-        overheatSlider.value = currentHeat;
+        isReducingEnergy = false;
+        overheatSlider.maxValue = maximumEnergy;
+        overheatSlider.value = currentEnergy;
         overheatSlider.transform.GetChild(1).GetComponentInChildren<Image>().color = Color.white;
 
         if (damageSlider != null && damageValueText != null)
@@ -263,7 +261,7 @@ public class ShootProjectile : MonoBehaviour
     {
         FireProjectile();
 
-        if (isCoolingDown || isReducingHeat)
+        if (isCoolingDown || isReducingEnergy)
         {
             Overheat();
         }
@@ -275,7 +273,7 @@ public class ShootProjectile : MonoBehaviour
         {
             if (Input.GetButton(fireButton) && Time.time > nextFireTime && !isReloading && canFire && !isCoolingDown)
             {
-                if (currentMagazineCount > 0 && currentHeat < maximumHeat)
+                if (currentMagazineCount > 0 && currentEnergy < maximumEnergy)
                 {
                     nextFireTime = Time.time + fireRate;
 
@@ -303,6 +301,17 @@ public class ShootProjectile : MonoBehaviour
                     Rigidbody bullet = Instantiate(projectile, transform.position, transform.rotation, null) as Rigidbody;
                     bullet.transform.localScale = new Vector3(bullet.transform.localScale.x * size, bullet.transform.localScale.y * size, bullet.transform.localScale.z * size);
 
+                    if (energyBoostOn)
+                    {
+                        damage = damageSlider.value;
+                        damage += Mathf.Round(currentEnergy * (energyBoost - 1) * 0.01f * damage);
+                    }
+
+                    if (bulletSpreadOn)
+                    {
+
+                    }
+
                     bullet.GetComponent<ProjectileBehavior>().projectileDamage = damage;
                     bullet.GetComponent<ProjectileBehavior>().projectileRange = distance;
                     bullet.GetComponent<ProjectileBehavior>().projectileDamageFallOff = range;
@@ -320,33 +329,23 @@ public class ShootProjectile : MonoBehaviour
                         bullet.GetComponent<ProjectileBehavior>().projectileAoEOn = AoEOn;
                     }
 
-                    if (rapidFireOn)
-                    {
-                        //StartCoroutine(RapidFire());
-                    }
-
-                    if (bulletSpreadOn)
-                    {
-
-                    }
-
                     bullet.AddForce(transform.forward * bulletVelocity);
 
                     if (usesOverheat)
                     {
-                        float energyAmount = maximumHeat / energy;
-                        currentHeat += energyAmount;
-                        overheatSlider.value = currentHeat;
+                        float energyAmount = maximumEnergy / energy;
+                        currentEnergy += energyAmount;
+                        overheatSlider.value = currentEnergy;
 
-                        if (currentHeat >= maximumHeat)
+                        if (currentEnergy >= maximumEnergy)
                         {
-                            currentHeat = maximumHeat;
+                            currentEnergy = maximumEnergy;
                             StopAllCoroutines();
                             StartCoroutine(Cooldown(true));
                         }
-                        else if (currentHeat < maximumHeat)
+                        else if (currentEnergy < maximumEnergy)
                         {
-                            isReducingHeat = false;
+                            isReducingEnergy = false;
                             StopAllCoroutines();
                             StartCoroutine(Cooldown(false));
                         }
@@ -374,8 +373,8 @@ public class ShootProjectile : MonoBehaviour
 
     void Overheat()
     {
-        currentHeat -= maximumHeat / (cooldownSpeed / Time.deltaTime);
-        overheatSlider.value = currentHeat;
+        currentEnergy -= maximumEnergy / (cooldownSpeed / Time.deltaTime);
+        overheatSlider.value = currentEnergy;
     }
 
     IEnumerator Reload()
@@ -406,13 +405,13 @@ public class ShootProjectile : MonoBehaviour
             isCoolingDown = true;
 
         if (!fullHeat)
-            isReducingHeat = true;
+            isReducingEnergy = true;
 
-        float amountToCoolDown = currentHeat / maximumHeat * cooldownSpeed;
+        float amountToCoolDown = currentEnergy / maximumEnergy * cooldownSpeed;
         yield return new WaitForSeconds(amountToCoolDown);
 
-        currentHeat = 0;
-        overheatSlider.value = currentHeat;
+        currentEnergy = 0;
+        overheatSlider.value = currentEnergy;
 
         if (fullHeat)
         {
@@ -421,26 +420,8 @@ public class ShootProjectile : MonoBehaviour
         }
 
         if (!fullHeat)
-            isReducingHeat = false;
+            isReducingEnergy = false;
     }
-
-    /*IEnumerator RapidFire()
-    {
-        bool hasBeenFiring = false;
-
-        if (Input.GetButton(fireButton))
-        {
-            hasBeenFiring = true;
-            rapidFireTimePassed += 0.5f;
-            fireRate = fireRate * (1 + rapidFireTimePassed) * rapidFireMultiplier;
-            yield return new WaitForSeconds(0.5f);
-        }
-        else
-        {
-            hasBeenFiring = false;
-            rapidFireTimePassed = 0;
-        }
-    }*/
 
     public void ChangeDamage()
     {
@@ -450,8 +431,8 @@ public class ShootProjectile : MonoBehaviour
 
     public void ChangeFireRate()
     {
-        fireRate = fireRateSlider.value / 1000;
-        fireRateValueText.text = (Mathf.Round(100 * fireRate) / 100).ToString();
+        fireRate = fireRateSlider.value / 100;
+        fireRateValueText.text = (Mathf.Round(100 * (5 / fireRate)) / 100).ToString();
     }
 
     public void ChangeRange()
@@ -521,8 +502,8 @@ public class ShootProjectile : MonoBehaviour
     {
         if (typeOfGun == gunType.Auto)
         {
-            timeToFullSpeed = trait1bSlider.value;
-            trait1bValueText.text = (Mathf.Round(100 * timeToFullSpeed) / 100).ToString();
+            energyBoost = trait1bSlider.value;
+            trait1bValueText.text = (Mathf.Round(100 * energyBoost) / 100).ToString();
         }
     }
 
@@ -548,8 +529,8 @@ public class ShootProjectile : MonoBehaviour
     {
         if (typeOfGun == gunType.Auto)
         {
-            timeToFullSpeed = trait2bSlider.value;
-            trait2bValueText.text = (Mathf.Round(100 * timeToFullSpeed) / 100).ToString();
+            energyBoost = trait2bSlider.value;
+            trait2bValueText.text = (Mathf.Round(100 * energyBoost) / 100).ToString();
         }
     }
 
@@ -569,26 +550,58 @@ public class ShootProjectile : MonoBehaviour
             if (trait1Dropdown.value == 0)
             {
                 AoEOn = false;
-                rapidFireOn = false;
+                energyBoostOn = false;
                 bulletSpreadOn = false;
                 
             }
             else if (trait1Dropdown.value == 1)
             {
                 AoEOn = true;
-                rapidFireOn = false;
+                energyBoostOn = false;
                 bulletSpreadOn = false;
             }
             else if (trait1Dropdown.value == 2)
             {
                 AoEOn = false;
-                rapidFireOn = true;
+                energyBoostOn = true;
                 bulletSpreadOn = false;
             }
             else if (trait1Dropdown.value == 3)
             {
                 AoEOn = false;
-                rapidFireOn = false;
+                energyBoostOn = false;
+                bulletSpreadOn = true;
+            }
+        }
+    }
+
+    public void ChangeTrait2Dropdown()
+    {
+        if (typeOfGun == gunType.Auto)
+        {
+            if (trait2Dropdown.value == 0)
+            {
+                AoEOn = false;
+                energyBoostOn = false;
+                bulletSpreadOn = false;
+
+            }
+            else if (trait2Dropdown.value == 1)
+            {
+                AoEOn = true;
+                energyBoostOn = false;
+                bulletSpreadOn = false;
+            }
+            else if (trait2Dropdown.value == 2)
+            {
+                AoEOn = false;
+                energyBoostOn = true;
+                bulletSpreadOn = false;
+            }
+            else if (trait2Dropdown.value == 3)
+            {
+                AoEOn = false;
+                energyBoostOn = false;
                 bulletSpreadOn = true;
             }
         }
