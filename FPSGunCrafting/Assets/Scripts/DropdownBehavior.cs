@@ -10,11 +10,13 @@ public class DropdownBehavior : MonoBehaviour
     [SerializeField]
     Dropdown otherTraitDropdown;
     [SerializeField]
+    SliderLimit sLimit;
+    [SerializeField]
     bool isTraitDropdown;
     [SerializeField]
     List<GameObject> components = new List<GameObject>();
 
-    List<UnityEngine.UI.Dropdown.OptionData> OtherDropdownOptions = new List<UnityEngine.UI.Dropdown.OptionData>();
+    List<Dropdown.OptionData> OtherDropdownOptions = new List<Dropdown.OptionData>();
 
     private void Start()
     {
@@ -32,8 +34,10 @@ public class DropdownBehavior : MonoBehaviour
         foreach (GameObject component in components)
         {
             component.SetActive(false);
+            sLimit.sliders.Remove(component.transform.GetComponentInChildren<Slider>());
         }
 
         components[dropdownMenu.value].SetActive(true);
+        sLimit.sliders.Insert(0, components[dropdownMenu.value].transform.GetComponentInChildren<Slider>());
     }
 }
