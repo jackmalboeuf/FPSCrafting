@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class ShootProjectile : MonoBehaviour
@@ -141,8 +142,8 @@ public class ShootProjectile : MonoBehaviour
     float cooldownPauseTime = 0.5f;
     bool energyBoostOn = false;
     bool bulletSpreadOn = false;
-    
-    void Start()
+
+    void Awake()
     {
         isReloading = false;
         currentMagazineCount = magazineSize;
@@ -275,7 +276,7 @@ public class ShootProjectile : MonoBehaviour
             {
                 if (currentMagazineCount > 0 && currentEnergy < maximumEnergy)
                 {
-                    nextFireTime = Time.time + fireRate;
+                    nextFireTime = 5 / fireRate + Time.time;
 
                     Vector3 rayStart = playerCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0));
                     RaycastHit rayHit;
@@ -309,7 +310,49 @@ public class ShootProjectile : MonoBehaviour
 
                     if (bulletSpreadOn)
                     {
+                        List<Rigidbody> bullets = new List<Rigidbody>();
+                        Rigidbody bullet1 = projectile;
+                        Rigidbody bullet2 = projectile;
+                        Rigidbody bullet3 = projectile;
+                        Rigidbody bullet4 = projectile;
+                        Rigidbody bullet5 = projectile;
+                        Rigidbody bullet6 = projectile;
+                        Rigidbody bullet7 = projectile;
+                        Rigidbody bullet8 = projectile;
 
+                        bullets.Add(bullet1);
+                        bullets.Add(bullet2);
+                        bullets.Add(bullet3);
+                        bullets.Add(bullet4);
+                        bullets.Add(bullet5);
+                        bullets.Add(bullet6);
+                        bullets.Add(bullet7);
+                        bullets.Add(bullet8);
+
+                        float plusOrMinus = -1;
+
+                        for (int i = 1; i < numberOfBullets; i++)
+                        {
+                            plusOrMinus *= -1;
+                            bullets[i - 1] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z + (i * plusOrMinus * 0.1f)), transform.rotation, null);
+                        }
+
+                        ChangeDamage();
+                        ChangeFireRate();
+                        ChangeRange();
+                        ChangeAccuracy();
+                        ChangeEnergy();
+                        ChangeCooldownSpeed();
+                        ChangeBulletVelocity();
+
+                        for (int i = 0; i < bullets.Count; i++)
+                        {
+                            bullets[i].GetComponent<ProjectileBehavior>().projectileDamage = damage;
+                            bullets[i].GetComponent<ProjectileBehavior>().projectileRange = distance;
+                            bullets[i].GetComponent<ProjectileBehavior>().projectileDamageFallOff = range;
+                            bullets[i].GetComponent<ProjectileBehavior>().projectileEndPoint = rangeEndPoint;
+                            bullets[i].AddForce(transform.forward * bulletVelocity);
+                        }
                     }
 
                     bullet.GetComponent<ProjectileBehavior>().projectileDamage = damage;
@@ -425,67 +468,67 @@ public class ShootProjectile : MonoBehaviour
 
     public void ChangeDamage()
     {
-        damage = damageSlider.value;
+        damage = Mathf.Round(Mathf.Lerp(5, 50, damageSlider.normalizedValue));
         damageValueText.text = damage.ToString();
     }
 
     public void ChangeFireRate()
     {
-        fireRate = fireRateSlider.value / 100;
-        fireRateValueText.text = (Mathf.Round(100 * (5 / fireRate)) / 100).ToString();
+        fireRate = Mathf.Round(Mathf.Lerp(10, 100, fireRateSlider.normalizedValue));
+        fireRateValueText.text = fireRate.ToString();
     }
 
     public void ChangeRange()
     {
-        range = rangeSlider.value;
+        range = Mathf.Round(Mathf.Lerp(1, 100, rangeSlider.normalizedValue));
         rangeValueText.text = range.ToString();
     }
 
     public void ChangeAccuracy()
     {
-        accuracy = accuracySlider.value / 100;
+        accuracy = Mathf.Lerp(5, 0, accuracySlider.normalizedValue);
         accuracyValueText.text = (Mathf.Round(100 * accuracy) / 100).ToString();
     }
 
     public void ChangeEnergy()
     {
-        energy = energySlider.value;
+        energy = Mathf.Round(Mathf.Lerp(1, 100, energySlider.normalizedValue));
         energyValueText.text = energy.ToString();
     }
 
     public void ChangeCooldownSpeed()
     {
-        cooldownSpeed = cooldownSpeedSlider.value / 10;
+        cooldownSpeed = Mathf.Lerp(10, 0.5f, cooldownSpeedSlider.normalizedValue);
         cooldownSpeedValueText.text = (Mathf.Round(100 * cooldownSpeed) / 100).ToString();
     }
 
     public void ChangeBulletVelocity()
     {
-        bulletVelocity = bulletVelocitySlider.value;
+        bulletVelocity = Mathf.Round(Mathf.Lerp(2000, 6000, bulletVelocitySlider.normalizedValue));
         bulletVelocityValueText.text = bulletVelocity.ToString();
     }
 
     public void ChangeMagazineSize()
     {
-        magazineSize = magazineSizeSlider.value;
+        magazineSize = Mathf.Lerp(1, 50, magazineSizeSlider.normalizedValue);
         magazineSizeValueText.text = magazineSize.ToString();
     }
 
     public void ChangeReloadSpeed()
     {
-        reloadSpeed = reloadSpeedSlider.value;
+        reloadSpeed = Mathf.Lerp(10, 0.5f, reloadSpeedSlider.normalizedValue);
         reloadSpeedValueText.text = reloadSpeed.ToString();
     }
 
     public void ChangeZoomDistance()
     {
-        zoomDistance = zoomDistanceSlider.value;
+        zoomDistance = Mathf.Round(Mathf.Lerp(55, 10, zoomDistanceSlider.normalizedValue));
         zoomDistanceValueText.text = zoomDistance.ToString();
     }
 
     public void ChangeMeleeDamage()
     {
-        meleeDamage = meleeDamageSlider.value;
+        meleeDamage = Mathf.Round(Mathf.Lerp(100, 500, meleeDamageSlider.normalizedValue));
         meleeDamageValueText.text = meleeDamage.ToString();
     }
 
@@ -493,7 +536,7 @@ public class ShootProjectile : MonoBehaviour
     {
         if (typeOfGun == gunType.Auto)
         {
-            AoESize = trait1aSlider.value;
+            AoESize = Mathf.Lerp(1, 5, trait1aSlider.normalizedValue);
             trait1aValueText.text = (Mathf.Round(100 * AoESize) / 100).ToString();
         }
     }
@@ -502,7 +545,7 @@ public class ShootProjectile : MonoBehaviour
     {
         if (typeOfGun == gunType.Auto)
         {
-            energyBoost = trait1bSlider.value;
+            energyBoost = Mathf.Lerp(1.25f, 1.75f, trait1bSlider.normalizedValue);
             trait1bValueText.text = (Mathf.Round(100 * energyBoost) / 100).ToString();
         }
     }
@@ -511,7 +554,7 @@ public class ShootProjectile : MonoBehaviour
     {
         if (typeOfGun == gunType.Auto)
         {
-            numberOfBullets = trait1cSlider.value;
+            numberOfBullets = Mathf.Round(Mathf.Lerp(1, 8, trait1cSlider.normalizedValue));
             trait1cValueText.text = numberOfBullets.ToString();
         }
     }
@@ -520,7 +563,7 @@ public class ShootProjectile : MonoBehaviour
     {
         if (typeOfGun == gunType.Auto)
         {
-            AoESize = trait2aSlider.value;
+            AoESize = Mathf.Lerp(1, 5, trait2aSlider.normalizedValue);
             trait2aValueText.text = (Mathf.Round(100 * AoESize) / 100).ToString();
         }
     }
@@ -529,7 +572,7 @@ public class ShootProjectile : MonoBehaviour
     {
         if (typeOfGun == gunType.Auto)
         {
-            energyBoost = trait2bSlider.value;
+            energyBoost = Mathf.Lerp(1.25f, 1.75f, trait2bSlider.normalizedValue);
             trait2bValueText.text = (Mathf.Round(100 * energyBoost) / 100).ToString();
         }
     }
@@ -538,7 +581,7 @@ public class ShootProjectile : MonoBehaviour
     {
         if (typeOfGun == gunType.Auto)
         {
-            numberOfBullets = trait2cSlider.value;
+            numberOfBullets = Mathf.Round(Mathf.Lerp(1, 8, trait2cSlider.normalizedValue));
             trait2cValueText.text = numberOfBullets.ToString();
         }
     }
@@ -609,6 +652,6 @@ public class ShootProjectile : MonoBehaviour
 
     float FindHalfwayPoint(float min, float max)
     {
-        return (min + max) / 2;
+        return (min + max) / 3;
     }
 }

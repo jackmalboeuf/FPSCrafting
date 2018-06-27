@@ -38,6 +38,9 @@ public class DropdownBehavior : MonoBehaviour
         }
 
         components[dropdownMenu.value].SetActive(true);
-        sLimit.sliders.Insert(0, components[dropdownMenu.value].transform.GetComponentInChildren<Slider>());
+        if (components[dropdownMenu.value].transform.GetComponentInChildren<Slider>())
+            sLimit.sliders.Insert(0, components[dropdownMenu.value].transform.GetComponentInChildren<Slider>());
+
+        sLimit.UpdateLimitText();
     }
 }
