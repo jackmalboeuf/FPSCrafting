@@ -64,7 +64,7 @@ public class SliderLimit : MonoBehaviour
     {
         sliderTotalValue = sliders.Count * 10;
         AddCurrentTotal();
-        GetComponent<Text>().text = sliderCurrentTotal.ToString() + " / " + sliderTotalValue.ToString();
+        GetComponent<Text>().text = "Points used: " + sliderCurrentTotal.ToString() + " \t\t\t " + "Total points: " + sliderTotalValue.ToString();
     }
 
     void AddCurrentTotal()

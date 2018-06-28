@@ -79,13 +79,17 @@ public class ShootProjectile : MonoBehaviour
     [SerializeField]
     Text trait1bValueText;
     [SerializeField]
-    Text trait1cValueText;
+    Text trait1cValueText1;
+    [SerializeField]
+    Text trait1cValueText2;
     [SerializeField]
     Text trait2aValueText;
     [SerializeField]
     Text trait2bValueText;
     [SerializeField]
-    Text trait2cValueText;
+    Text trait2cValueText1;
+    [SerializeField]
+    Text trait2cValueText2;
     [SerializeField]
     Dropdown alternateAttackDropdown;
     [SerializeField]
@@ -131,7 +135,7 @@ public class ShootProjectile : MonoBehaviour
     float energy = 100;
     float cooldownSpeed = 10;
     float energyBoost = 1.25f;
-    float numberOfBullets = 1;
+    float numberOfAdditionalBullets = 1;
     float nextFireTime;
     float currentMagazineCount;
     bool isReloading;
@@ -142,6 +146,8 @@ public class ShootProjectile : MonoBehaviour
     float cooldownPauseTime = 0.5f;
     bool energyBoostOn = false;
     bool bulletSpreadOn = false;
+    bool repeaterOn = false;
+    bool shotgunOn = false;
 
     void Awake()
     {
@@ -233,7 +239,7 @@ public class ShootProjectile : MonoBehaviour
             ChangeTrait1b();
         }
 
-        if (trait1cSlider != null && trait1cValueText != null)
+        if (trait1cSlider != null && trait1cValueText2 != null)
         {
             trait1cSlider.value = FindHalfwayPoint(trait1cSlider.minValue, trait1cSlider.maxValue);
             ChangeTrait1c();
@@ -251,7 +257,7 @@ public class ShootProjectile : MonoBehaviour
             ChangeTrait2b();
         }
 
-        if (trait2cSlider != null && trait2cValueText != null)
+        if (trait2cSlider != null && trait2cValueText1 != null)
         {
             trait2cSlider.value = FindHalfwayPoint(trait2cSlider.minValue, trait2cSlider.maxValue);
             ChangeTrait2c();
@@ -276,6 +282,8 @@ public class ShootProjectile : MonoBehaviour
             {
                 if (currentMagazineCount > 0 && currentEnergy < maximumEnergy)
                 {
+                    ChangeFireRate();
+
                     nextFireTime = 5 / fireRate + Time.time;
 
                     Vector3 rayStart = playerCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0));
@@ -330,11 +338,11 @@ public class ShootProjectile : MonoBehaviour
                         bullets.Add(bullet8);
 
                         float plusOrMinus = -1;
-
-                        for (int i = 1; i < numberOfBullets; i++)
+                        
+                        for (int i = 1; i <= numberOfAdditionalBullets; i++)
                         {
                             plusOrMinus *= -1;
-                            bullets[i - 1] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z + (i * plusOrMinus * 0.1f)), transform.rotation, null);
+                            bullets[i - 1] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z + (plusOrMinus * 0.1f * i)), transform.rotation, null) as Rigidbody;
                         }
 
                         ChangeDamage();
@@ -475,6 +483,12 @@ public class ShootProjectile : MonoBehaviour
     public void ChangeFireRate()
     {
         fireRate = Mathf.Round(Mathf.Lerp(10, 100, fireRateSlider.normalizedValue));
+
+        if (bulletSpreadOn)
+        {
+            fireRate = Mathf.Round(fireRate / numberOfAdditionalBullets);
+        }
+
         fireRateValueText.text = fireRate.ToString();
     }
 
@@ -506,6 +520,14 @@ public class ShootProjectile : MonoBehaviour
     {
         bulletVelocity = Mathf.Round(Mathf.Lerp(2000, 6000, bulletVelocitySlider.normalizedValue));
         bulletVelocityValueText.text = bulletVelocity.ToString();
+    }
+
+    public void ChangeDistance()
+    {
+        if (shotgunOn)
+        {
+            distance /= numberOfAdditionalBullets;
+        }
     }
 
     public void ChangeMagazineSize()
@@ -554,8 +576,10 @@ public class ShootProjectile : MonoBehaviour
     {
         if (typeOfGun == gunType.Auto)
         {
-            numberOfBullets = Mathf.Round(Mathf.Lerp(1, 8, trait1cSlider.normalizedValue));
-            trait1cValueText.text = numberOfBullets.ToString();
+            numberOfAdditionalBullets = Mathf.Round(Mathf.Lerp(1, 8, trait1cSlider.normalizedValue));
+            trait1cValueText1.text = numberOfAdditionalBullets.ToString();
+            trait1cValueText2.text = "1/" + numberOfAdditionalBullets;
+            ChangeFireRate();
         }
     }
 
@@ -581,8 +605,10 @@ public class ShootProjectile : MonoBehaviour
     {
         if (typeOfGun == gunType.Auto)
         {
-            numberOfBullets = Mathf.Round(Mathf.Lerp(1, 8, trait2cSlider.normalizedValue));
-            trait2cValueText.text = numberOfBullets.ToString();
+            numberOfAdditionalBullets = Mathf.Round(Mathf.Lerp(1, 8, trait2cSlider.normalizedValue));
+            trait2cValueText1.text = numberOfAdditionalBullets.ToString();
+            trait2cValueText2.text = "1/" + numberOfAdditionalBullets;
+            ChangeFireRate();
         }
     }
 

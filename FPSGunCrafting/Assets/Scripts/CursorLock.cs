@@ -19,14 +19,14 @@ public class CursorLock : MonoBehaviour
         CheckIfCursorShouldBeLocked();
     }
 
-    void ToggleCursorState()
+    public void ToggleCursorState()
     {
         isCursorLocked = !isCursorLocked;
     }
 
     void CheckInput()
     {
-        if (Input.GetButtonDown("Cancel") || Input.GetButtonDown("Menu"))
+        if (Input.GetButtonDown("Cancel")/* || Input.GetButtonDown("Menu")*/)
         {
             ToggleCursorState();
         }

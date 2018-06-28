@@ -12,6 +12,8 @@ public class DropdownBehavior : MonoBehaviour
     [SerializeField]
     SliderLimit sLimit;
     [SerializeField]
+    ShootProjectile shoot;
+    [SerializeField]
     bool isTraitDropdown;
     [SerializeField]
     List<GameObject> components = new List<GameObject>();
@@ -42,5 +44,8 @@ public class DropdownBehavior : MonoBehaviour
             sLimit.sliders.Insert(0, components[dropdownMenu.value].transform.GetComponentInChildren<Slider>());
 
         sLimit.UpdateLimitText();
+        shoot.ChangeDamage();
+        shoot.ChangeFireRate();
+        shoot.ChangeDistance();
     }
 }

@@ -11,7 +11,22 @@ public class ToolTip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     [SerializeField]
     toolTipString TTString = 0;
 
-    enum toolTipString { DamageDesc = 0, FirerateDesc = 1, RangeDesc = 2, AccuracyDesc = 3, EnergyDesc = 4, CooldownSpeedDesc = 5, BulletVelocity = 6 }
+    enum toolTipString
+    {
+        DamageDesc = 0,
+        FirerateDesc = 1,
+        RangeDesc = 2,
+        AccuracyDesc = 3,
+        EnergyDesc = 4,
+        CooldownSpeedDesc = 5,
+        BulletVelocity = 6,
+        ZoomDistanceDesc = 7,
+        MeleeDamageDesc = 8,
+        ExplosionSizeDesc = 9,
+        DamageMultiplierDesc = 10,
+        AdditionalBulletsDesc = 11
+    }
+
     Text toolTipText;
 
     private void Start()
@@ -21,10 +36,13 @@ public class ToolTip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        toolTipObject.SetActive(true);
-        toolTipObject.transform.position = transform.position;
-        SetToolTipText();
-        StopAllCoroutines();
+        if (!Input.GetButton("Fire1"))
+        {
+            toolTipObject.SetActive(true);
+            toolTipObject.transform.position = transform.position;
+            SetToolTipText();
+            StopAllCoroutines();
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -69,6 +87,26 @@ public class ToolTip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         else if (TTString == toolTipString.BulletVelocity)
         {
             toolTipText.text = "Speed at which bullets travel. ";
+        }
+        else if (TTString == toolTipString.ZoomDistanceDesc)
+        {
+            toolTipText.text = "Distance the scope zooms in. ";
+        }
+        else if (TTString == toolTipString.MeleeDamageDesc)
+        {
+            toolTipText.text = "Amount of damage melee attacks do. ";
+        }
+        else if (TTString == toolTipString.ExplosionSizeDesc)
+        {
+            toolTipText.text = "Size of the explosion when bullets hit their target. ";
+        }
+        else if (TTString == toolTipString.DamageMultiplierDesc)
+        {
+            toolTipText.text = "Amount of additional damage for each point of energy. ";
+        }
+        else if (TTString == toolTipString.AdditionalBulletsDesc)
+        {
+            toolTipText.text = "Number of additional bullets fired. ";
         }
     }
 }

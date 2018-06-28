@@ -27,16 +27,20 @@ public class PlayerAnimation : MonoBehaviour
     Transform meleeHandle;
     [SerializeField]
     GameObject reticle;
+    [SerializeField]
+    ActivateOnButtonPress menuManager;
+
+    [HideInInspector]
+    public bool isScoped = false;
 
     float scopedFOV;
-    bool isScoped = false;
     float scopeTime = 0.15f;
     float unscopedFOV;
     bool isMeleeing = false;
 
     private void Update()
     {
-        if (Input.GetButtonDown(alternateFireButton))
+        if (Input.GetButtonDown(alternateFireButton) && !menuManager.tuningMenu.activeSelf)
         {
             if (projectileSpawn.typeOfGun == ShootProjectile.gunType.Auto)
             {
@@ -64,6 +68,7 @@ public class PlayerAnimation : MonoBehaviour
         yield return new WaitForSeconds(scopeTime);
         scopeOverlay.SetActive(true);
         weaponCamera.SetActive(false);
+        menuManager.canShowMenu = false;
 
         scopedFOV = projectileSpawn.zoomDistance;
         reticle.SetActive(false);
@@ -80,6 +85,7 @@ public class PlayerAnimation : MonoBehaviour
         scopeOverlay.SetActive(false);
         weaponCamera.SetActive(true);
         reticle.SetActive(true);
+        menuManager.canShowMenu = true;
 
         mainCamera.fieldOfView = unscopedFOV;
     }
@@ -90,7 +96,7 @@ public class PlayerAnimation : MonoBehaviour
         projectileSpawn.canFire = false;
         GetComponent<Animator>().SetBool("IsMeleeing", isMeleeing);
         yield return new WaitForSeconds(0.08f);
-        GameObject meleeCollider = Instantiate(meleeCollision, meleeHandle);
+        GameObject meleeCollider = Instantiate(meleeCollision, meleeHandle) as GameObject;
         meleeCollider.GetComponent<MeleeColliderDamage>().meleeDamage = projectileSpawn.meleeDamage;
         yield return new WaitForSeconds(0.07f);
         Destroy(meleeCollider);
