@@ -7,14 +7,12 @@ public class SwitchMenuTabs : MonoBehaviour
 {
     [SerializeField]
     GameObject tuningPanel;
-
-    private void Update()
-    {
-        if (tuningPanel.activeSelf)
-        {
-            //GetComponent<Button>() = Color.white;
-        }
-    }
+    [SerializeField]
+    GameObject scopeGunArms;
+    [SerializeField]
+    ShootProjectile projectileSpawn;
+    [SerializeField]
+    CursorLock cLock;
 
     public void PressTabButton()
     {
@@ -23,7 +21,15 @@ public class SwitchMenuTabs : MonoBehaviour
             transform.parent.GetChild(i).GetComponent<SwitchMenuTabs>().tuningPanel.SetActive(false);
         }
 
+        for (int i = 0; i < scopeGunArms.transform.parent.childCount; i++)
+        {
+            if (scopeGunArms.transform.parent.GetChild(i) != scopeGunArms.transform.parent.GetChild(0))
+                scopeGunArms.transform.parent.GetChild(i).gameObject.SetActive(false);
+        }
+
         tuningPanel.SetActive(true);
-        GetComponent<Image>().color = Color.white;
+        scopeGunArms.SetActive(true);
+        cLock.projectileSpawn = projectileSpawn;
+        projectileSpawn.currentEnergy = 0;
     }
 }

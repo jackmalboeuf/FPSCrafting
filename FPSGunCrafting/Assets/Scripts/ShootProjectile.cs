@@ -102,7 +102,7 @@ public class ShootProjectile : MonoBehaviour
     bool usesReload;
 
     [HideInInspector]
-    public enum gunType { Auto = 0, SemiAuto = 1, Lazer = 2, Bow = 3, Launcher = 4 }
+    public enum gunType { Auto = 0, SemiAuto = 1, Lazer = 2 }
     [HideInInspector]
     public float damage = 1;
     [HideInInspector]
@@ -125,6 +125,8 @@ public class ShootProjectile : MonoBehaviour
     public bool AoEOn = false;
     [HideInInspector]
     public bool bulletDropOn = false;
+    [HideInInspector]
+    public float currentEnergy;
     
     float fireRate = 0.3f;
     float accuracy = 5;
@@ -139,7 +141,6 @@ public class ShootProjectile : MonoBehaviour
     float nextFireTime;
     float currentMagazineCount;
     bool isReloading;
-    float currentEnergy;
     bool isCoolingDown;
     bool isReducingEnergy;
     float maximumEnergy = 100;
@@ -148,6 +149,8 @@ public class ShootProjectile : MonoBehaviour
     bool bulletSpreadOn = false;
     bool repeaterOn = false;
     bool shotgunOn = false;
+    float previousDropdown1;
+    float previousDropdown2;
 
     void Awake()
     {
@@ -160,6 +163,8 @@ public class ShootProjectile : MonoBehaviour
         overheatSlider.maxValue = maximumEnergy;
         overheatSlider.value = currentEnergy;
         overheatSlider.transform.GetChild(1).GetComponentInChildren<Image>().color = Color.white;
+        previousDropdown1 = 0;
+        previousDropdown2 = 0;
 
         if (damageSlider != null && damageValueText != null)
         {
@@ -266,7 +271,20 @@ public class ShootProjectile : MonoBehaviour
 
     void Update()
     {
-        FireProjectile();
+        if (typeOfGun == gunType.Auto || typeOfGun == gunType.Lazer)
+        {
+            if (Input.GetButton(fireButton))
+            {
+                FireProjectile();
+            }
+        }
+        else if (typeOfGun == gunType.SemiAuto)
+        {
+            if (Input.GetButtonDown(fireButton))
+            {
+                FireProjectile();
+            }
+        }
 
         if (isCoolingDown || isReducingEnergy)
         {
@@ -276,143 +294,154 @@ public class ShootProjectile : MonoBehaviour
 
     void FireProjectile()
     {
-        if (typeOfGun == gunType.Auto)
+        if (Time.time > nextFireTime && !isReloading && canFire && !isCoolingDown)
         {
-            if (Input.GetButton(fireButton) && Time.time > nextFireTime && !isReloading && canFire && !isCoolingDown)
+            if (currentMagazineCount > 0 && currentEnergy < maximumEnergy)
             {
-                if (currentMagazineCount > 0 && currentEnergy < maximumEnergy)
+                ChangeFireRate();
+
+                nextFireTime = 5 / fireRate + Time.time;
+
+                Vector3 rayStart = playerCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0));
+                RaycastHit rayHit;
+                Ray lookRay = new Ray(rayStart, playerCamera.transform.forward);
+                
+                rangeEndPoint = lookRay.GetPoint(distance);
+
+                if (Physics.Raycast(lookRay, out rayHit, distance) && rayHit.collider.tag != "Damager")
                 {
-                    ChangeFireRate();
+                    transform.parent.LookAt(rayHit.point);
+                }
+                else
+                {
+                    transform.parent.LookAt(lookRay.GetPoint(distance));
+                }
 
-                    nextFireTime = 5 / fireRate + Time.time;
-
-                    Vector3 rayStart = playerCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0));
-                    RaycastHit rayHit;
-                    Ray lookRay = new Ray(rayStart, playerCamera.transform.forward);
-                    
-                    rangeEndPoint = lookRay.GetPoint(distance);
-
-                    if (Physics.Raycast(lookRay, out rayHit, distance) && rayHit.collider.tag != "Damager")
-                    {
-                        transform.parent.LookAt(rayHit.point);
-                    }
-                    else
-                    {
-                        transform.parent.LookAt(lookRay.GetPoint(distance));
-                    }
-
+                if (typeOfGun == gunType.Auto || typeOfGun == gunType.Lazer)
+                {
                     float xRand = Random.Range(0, accuracy);
                     float zRand = Random.Range(0, 359);
 
                     transform.localEulerAngles = new Vector3(xRand, transform.localEulerAngles.y, transform.localEulerAngles.z);
                     transform.Rotate(transform.parent.forward, zRand, Space.World);
-                    
-                    Rigidbody bullet = Instantiate(projectile, transform.position, transform.rotation, null) as Rigidbody;
+                }
+
+                Rigidbody bullet = new Rigidbody();
+
+                if (typeOfGun == gunType.Auto || typeOfGun == gunType.SemiAuto)
+                {
+                    bullet = Instantiate(projectile, transform.position, transform.rotation, null) as Rigidbody;
                     bullet.transform.localScale = new Vector3(bullet.transform.localScale.x * size, bullet.transform.localScale.y * size, bullet.transform.localScale.z * size);
+                }
 
-                    if (energyBoostOn)
+                if (energyBoostOn)
+                {
+                    damage = damageSlider.value;
+                    damage += Mathf.Round(currentEnergy * (energyBoost - 1) * 0.01f * damage);
+                }
+
+                if (bulletSpreadOn)
+                {
+                    List<Rigidbody> bullets = new List<Rigidbody>();
+                    Rigidbody bullet1 = projectile;
+                    Rigidbody bullet2 = projectile;
+                    Rigidbody bullet3 = projectile;
+                    Rigidbody bullet4 = projectile;
+                    Rigidbody bullet5 = projectile;
+                    Rigidbody bullet6 = projectile;
+                    Rigidbody bullet7 = projectile;
+                    Rigidbody bullet8 = projectile;
+
+                    bullets.Add(bullet1);
+                    bullets.Add(bullet2);
+                    bullets.Add(bullet3);
+                    bullets.Add(bullet4);
+                    bullets.Add(bullet5);
+                    bullets.Add(bullet6);
+                    bullets.Add(bullet7);
+                    bullets.Add(bullet8);
+
+                    float plusOrMinus = -1;
+                    
+                    for (int i = 1; i <= numberOfAdditionalBullets; i++)
                     {
-                        damage = damageSlider.value;
-                        damage += Mathf.Round(currentEnergy * (energyBoost - 1) * 0.01f * damage);
+                        plusOrMinus *= -1;
+                        bullets[i - 1] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z + (plusOrMinus * 0.1f * i)), transform.rotation, null) as Rigidbody;
                     }
 
-                    if (bulletSpreadOn)
+                    ChangeDamage();
+                    ChangeFireRate();
+                    ChangeRange();
+                    ChangeAccuracy();
+                    ChangeEnergy();
+                    ChangeCooldownSpeed();
+                    ChangeBulletVelocity();
+
+                    for (int i = 0; i < bullets.Count; i++)
                     {
-                        List<Rigidbody> bullets = new List<Rigidbody>();
-                        Rigidbody bullet1 = projectile;
-                        Rigidbody bullet2 = projectile;
-                        Rigidbody bullet3 = projectile;
-                        Rigidbody bullet4 = projectile;
-                        Rigidbody bullet5 = projectile;
-                        Rigidbody bullet6 = projectile;
-                        Rigidbody bullet7 = projectile;
-                        Rigidbody bullet8 = projectile;
-
-                        bullets.Add(bullet1);
-                        bullets.Add(bullet2);
-                        bullets.Add(bullet3);
-                        bullets.Add(bullet4);
-                        bullets.Add(bullet5);
-                        bullets.Add(bullet6);
-                        bullets.Add(bullet7);
-                        bullets.Add(bullet8);
-
-                        float plusOrMinus = -1;
-                        
-                        for (int i = 1; i <= numberOfAdditionalBullets; i++)
-                        {
-                            plusOrMinus *= -1;
-                            bullets[i - 1] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z + (plusOrMinus * 0.1f * i)), transform.rotation, null) as Rigidbody;
-                        }
-
-                        ChangeDamage();
-                        ChangeFireRate();
-                        ChangeRange();
-                        ChangeAccuracy();
-                        ChangeEnergy();
-                        ChangeCooldownSpeed();
-                        ChangeBulletVelocity();
-
-                        for (int i = 0; i < bullets.Count; i++)
-                        {
-                            bullets[i].GetComponent<ProjectileBehavior>().projectileDamage = damage;
-                            bullets[i].GetComponent<ProjectileBehavior>().projectileRange = distance;
-                            bullets[i].GetComponent<ProjectileBehavior>().projectileDamageFallOff = range;
-                            bullets[i].GetComponent<ProjectileBehavior>().projectileEndPoint = rangeEndPoint;
-                            bullets[i].AddForce(transform.forward * bulletVelocity);
-                        }
+                        bullets[i].GetComponent<ProjectileBehavior>().projectileDamage = damage;
+                        bullets[i].GetComponent<ProjectileBehavior>().projectileRange = distance;
+                        bullets[i].GetComponent<ProjectileBehavior>().projectileDamageFallOff = range;
+                        bullets[i].GetComponent<ProjectileBehavior>().projectileEndPoint = rangeEndPoint;
+                        bullets[i].AddForce(transform.forward * bulletVelocity);
                     }
+                }
 
+                if (typeOfGun == gunType.Auto || typeOfGun == gunType.SemiAuto)
+                {
                     bullet.GetComponent<ProjectileBehavior>().projectileDamage = damage;
                     bullet.GetComponent<ProjectileBehavior>().projectileRange = distance;
                     bullet.GetComponent<ProjectileBehavior>().projectileDamageFallOff = range;
                     bullet.GetComponent<ProjectileBehavior>().projectileEndPoint = rangeEndPoint;
-
-                    if (bulletDropOn)
-                    {
-                        bullet.GetComponent<ProjectileBehavior>().projectileDrop = bulletDrop;
-                        bullet.GetComponent<ProjectileBehavior>().projectileDropOn = bulletDropOn;
-                    }
-
-                    if (AoEOn)
-                    {
-                        bullet.GetComponent<ProjectileBehavior>().projectileAoESize = AoESize;
-                        bullet.GetComponent<ProjectileBehavior>().projectileAoEOn = AoEOn;
-                    }
-
-                    bullet.AddForce(transform.forward * bulletVelocity);
-
-                    if (usesOverheat)
-                    {
-                        float energyAmount = maximumEnergy / energy;
-                        currentEnergy += energyAmount;
-                        overheatSlider.value = currentEnergy;
-
-                        if (currentEnergy >= maximumEnergy)
-                        {
-                            currentEnergy = maximumEnergy;
-                            StopAllCoroutines();
-                            StartCoroutine(Cooldown(true));
-                        }
-                        else if (currentEnergy < maximumEnergy)
-                        {
-                            isReducingEnergy = false;
-                            StopAllCoroutines();
-                            StartCoroutine(Cooldown(false));
-                        }
-                    }
-                    
-                    if (usesReload)
-                    {
-                        currentMagazineCount--;
-                        if (currentMagazineCount < 0)
-                            currentMagazineCount = 0;
-                    }
                 }
-                else if (currentMagazineCount <= 0 && usesReload)
+
+                if (bulletDropOn)
                 {
-                    StartCoroutine(Reload());
+                    bullet.GetComponent<ProjectileBehavior>().projectileDrop = bulletDrop;
+                    bullet.GetComponent<ProjectileBehavior>().projectileDropOn = bulletDropOn;
                 }
+
+                if (AoEOn)
+                {
+                    bullet.GetComponent<ProjectileBehavior>().projectileAoESize = AoESize;
+                    bullet.GetComponent<ProjectileBehavior>().projectileAoEOn = AoEOn;
+                }
+
+                if (typeOfGun == gunType.Auto || typeOfGun == gunType.SemiAuto)
+                {
+                    bullet.AddForce(transform.forward * bulletVelocity);
+                }
+
+                if (usesOverheat)
+                {
+                    float energyAmount = maximumEnergy / energy;
+                    currentEnergy += energyAmount;
+                    overheatSlider.value = currentEnergy;
+
+                    if (currentEnergy >= maximumEnergy)
+                    {
+                        currentEnergy = maximumEnergy;
+                        StopAllCoroutines();
+                        StartCoroutine(Cooldown(true));
+                    }
+                    else if (currentEnergy < maximumEnergy)
+                    {
+                        isReducingEnergy = false;
+                        StopAllCoroutines();
+                        StartCoroutine(Cooldown(false));
+                    }
+                }
+                
+                if (usesReload)
+                {
+                    currentMagazineCount--;
+                    if (currentMagazineCount < 0)
+                        currentMagazineCount = 0;
+                }
+            }
+            else if (currentMagazineCount <= 0 && usesReload)
+            {
+                StartCoroutine(Reload());
             }
         }
 
@@ -476,13 +505,20 @@ public class ShootProjectile : MonoBehaviour
 
     public void ChangeDamage()
     {
-        damage = Mathf.Round(Mathf.Lerp(5, 50, damageSlider.normalizedValue));
+        if (typeOfGun == gunType.Auto)
+            damage = Mathf.Round(Mathf.Lerp(5, 50, damageSlider.normalizedValue));
+        if (typeOfGun == gunType.SemiAuto)
+            damage = Mathf.Round(Mathf.Lerp(10, 100, damageSlider.normalizedValue));
+
         damageValueText.text = damage.ToString();
     }
 
     public void ChangeFireRate()
     {
-        fireRate = Mathf.Round(Mathf.Lerp(10, 100, fireRateSlider.normalizedValue));
+        if (typeOfGun == gunType.Auto)
+            fireRate = Mathf.Round(Mathf.Lerp(10, 100, fireRateSlider.normalizedValue));
+        if (typeOfGun == gunType.SemiAuto)
+            fireRate = Mathf.Round(Mathf.Lerp(5, 50, fireRateSlider.normalizedValue));
 
         if (bulletSpreadOn)
         {
@@ -556,20 +592,14 @@ public class ShootProjectile : MonoBehaviour
 
     public void ChangeTrait1a()
     {
-        if (typeOfGun == gunType.Auto)
-        {
-            AoESize = Mathf.Lerp(1, 5, trait1aSlider.normalizedValue);
-            trait1aValueText.text = (Mathf.Round(100 * AoESize) / 100).ToString();
-        }
+        AoESize = Mathf.Lerp(1, 5, trait1aSlider.normalizedValue);
+        trait1aValueText.text = (Mathf.Round(100 * AoESize) / 100).ToString();
     }
 
     public void ChangeTrait1b()
     {
-        if (typeOfGun == gunType.Auto)
-        {
-            energyBoost = Mathf.Lerp(1.25f, 1.75f, trait1bSlider.normalizedValue);
-            trait1bValueText.text = (Mathf.Round(100 * energyBoost) / 100).ToString();
-        }
+        energyBoost = Mathf.Lerp(1.25f, 1.75f, trait1bSlider.normalizedValue);
+        trait1bValueText.text = (Mathf.Round(100 * energyBoost) / 100).ToString();
     }
 
     public void ChangeTrait1c()
@@ -581,24 +611,26 @@ public class ShootProjectile : MonoBehaviour
             trait1cValueText2.text = "1/" + numberOfAdditionalBullets;
             ChangeFireRate();
         }
+        else if (typeOfGun == gunType.SemiAuto)
+        {
+
+        }
+        else if (typeOfGun == gunType.Lazer)
+        {
+
+        }
     }
 
     public void ChangeTrait2a()
     {
-        if (typeOfGun == gunType.Auto)
-        {
-            AoESize = Mathf.Lerp(1, 5, trait2aSlider.normalizedValue);
-            trait2aValueText.text = (Mathf.Round(100 * AoESize) / 100).ToString();
-        }
+        AoESize = Mathf.Lerp(1, 5, trait2aSlider.normalizedValue);
+        trait2aValueText.text = (Mathf.Round(100 * AoESize) / 100).ToString();
     }
 
     public void ChangeTrait2b()
     {
-        if (typeOfGun == gunType.Auto)
-        {
-            energyBoost = Mathf.Lerp(1.25f, 1.75f, trait2bSlider.normalizedValue);
-            trait2bValueText.text = (Mathf.Round(100 * energyBoost) / 100).ToString();
-        }
+        energyBoost = Mathf.Lerp(1.25f, 1.75f, trait2bSlider.normalizedValue);
+        trait2bValueText.text = (Mathf.Round(100 * energyBoost) / 100).ToString();
     }
 
     public void ChangeTrait2c()
@@ -610,69 +642,179 @@ public class ShootProjectile : MonoBehaviour
             trait2cValueText2.text = "1/" + numberOfAdditionalBullets;
             ChangeFireRate();
         }
+        else if (typeOfGun == gunType.SemiAuto)
+        {
+
+        }
+        else if (typeOfGun == gunType.Lazer)
+        {
+
+        }
     }
 
     public void ChangeTrait1Dropdown()
     {
-        if (typeOfGun == gunType.Auto)
+        if (trait1Dropdown.value == 0)
         {
-            if (trait1Dropdown.value == 0)
-            {
-                AoEOn = false;
-                energyBoostOn = false;
+            AoEOn = false;
+            energyBoostOn = false;
+            if (typeOfGun == gunType.Auto)
                 bulletSpreadOn = false;
-                
-            }
-            else if (trait1Dropdown.value == 1)
-            {
-                AoEOn = true;
-                energyBoostOn = false;
+            if (typeOfGun == gunType.SemiAuto)
+                repeaterOn = false;
+            if (typeOfGun == gunType.Lazer)
+                shotgunOn = false;
+        }
+        else if (trait1Dropdown.value == 1)
+        {
+            AoEOn = true;
+            energyBoostOn = false;
+            if (typeOfGun == gunType.Auto)
                 bulletSpreadOn = false;
-            }
-            else if (trait1Dropdown.value == 2)
-            {
-                AoEOn = false;
-                energyBoostOn = true;
+            if (typeOfGun == gunType.SemiAuto)
+                repeaterOn = false;
+            if (typeOfGun == gunType.Lazer)
+                shotgunOn = false;
+        }
+        else if (trait1Dropdown.value == 2)
+        {
+            AoEOn = false;
+            energyBoostOn = true;
+            if (typeOfGun == gunType.Auto)
                 bulletSpreadOn = false;
-            }
-            else if (trait1Dropdown.value == 3)
-            {
-                AoEOn = false;
-                energyBoostOn = false;
+            if (typeOfGun == gunType.SemiAuto)
+                repeaterOn = false;
+            if (typeOfGun == gunType.Lazer)
+                shotgunOn = false;
+        }
+        else if (trait1Dropdown.value == 3)
+        {
+            AoEOn = false;
+            energyBoostOn = false;
+            if (typeOfGun == gunType.Auto)
                 bulletSpreadOn = true;
-            }
+            if (typeOfGun == gunType.SemiAuto)
+                repeaterOn = true;
+            if (typeOfGun == gunType.Lazer)
+                shotgunOn = true;
+        }
+
+        if (previousDropdown2 == 1)
+        {
+            AoEOn = true;
+        }
+        else if (previousDropdown2 == 2)
+        {
+            energyBoostOn = true;
+        }
+        else if (previousDropdown2 == 3)
+        {
+            if (typeOfGun == gunType.Auto)
+                bulletSpreadOn = true;
+            if (typeOfGun == gunType.SemiAuto)
+                repeaterOn = true;
+            if (typeOfGun == gunType.Lazer)
+                shotgunOn = true;
+        }
+
+        if (trait1Dropdown.value == 0)
+        {
+            previousDropdown1 = 0;
+        }
+        else if (trait1Dropdown.value == 1)
+        {
+            previousDropdown1 = 1;
+        }
+        else if (trait1Dropdown.value == 2)
+        {
+            previousDropdown1 = 2;
+        }
+        else if (trait1Dropdown.value == 3)
+        {
+            previousDropdown1 = 3;
         }
     }
 
     public void ChangeTrait2Dropdown()
     {
-        if (typeOfGun == gunType.Auto)
+        if (trait2Dropdown.value == 0)
         {
-            if (trait2Dropdown.value == 0)
-            {
-                AoEOn = false;
-                energyBoostOn = false;
+            AoEOn = false;
+            energyBoostOn = false;
+            if (typeOfGun == gunType.Auto)
                 bulletSpreadOn = false;
-
-            }
-            else if (trait2Dropdown.value == 1)
-            {
-                AoEOn = true;
-                energyBoostOn = false;
+            if (typeOfGun == gunType.SemiAuto)
+                repeaterOn = false;
+            if (typeOfGun == gunType.Lazer)
+                shotgunOn = false;
+        }
+        else if (trait2Dropdown.value == 1)
+        {
+            AoEOn = true;
+            energyBoostOn = false;
+            if (typeOfGun == gunType.Auto)
                 bulletSpreadOn = false;
-            }
-            else if (trait2Dropdown.value == 2)
-            {
-                AoEOn = false;
-                energyBoostOn = true;
+            if (typeOfGun == gunType.SemiAuto)
+                repeaterOn = false;
+            if (typeOfGun == gunType.Lazer)
+                shotgunOn = false;
+        }
+        else if (trait2Dropdown.value == 2)
+        {
+            AoEOn = false;
+            energyBoostOn = true;
+            if (typeOfGun == gunType.Auto)
                 bulletSpreadOn = false;
-            }
-            else if (trait2Dropdown.value == 3)
-            {
-                AoEOn = false;
-                energyBoostOn = false;
+            if (typeOfGun == gunType.SemiAuto)
+                repeaterOn = false;
+            if (typeOfGun == gunType.Lazer)
+                shotgunOn = false;
+        }
+        else if (trait2Dropdown.value == 3)
+        {
+            AoEOn = false;
+            energyBoostOn = false;
+            if (typeOfGun == gunType.Auto)
                 bulletSpreadOn = true;
-            }
+            if (typeOfGun == gunType.SemiAuto)
+                repeaterOn = true;
+            if (typeOfGun == gunType.Lazer)
+                shotgunOn = true;
+        }
+
+        if (previousDropdown1 == 1)
+        {
+            AoEOn = true;
+        }
+        else if (previousDropdown1 == 2)
+        {
+            energyBoostOn = true;
+        }
+        else if (previousDropdown1 == 3)
+        {
+            if (typeOfGun == gunType.Auto)
+                bulletSpreadOn = true;
+            if (typeOfGun == gunType.SemiAuto)
+                repeaterOn = true;
+            if (typeOfGun == gunType.Lazer)
+                shotgunOn = true;
+        }
+
+        if (trait2Dropdown.value == 0)
+        {
+            previousDropdown2 = 0;
+        }
+        else if (trait2Dropdown.value == 1)
+        {
+            previousDropdown2 = 1;
+        }
+        else if (trait2Dropdown.value == 2)
+        {
+            previousDropdown2 = 2;
+        }
+        else if (trait2Dropdown.value == 3)
+        {
+            previousDropdown2 = 3;
         }
     }
 

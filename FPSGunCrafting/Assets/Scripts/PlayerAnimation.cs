@@ -42,23 +42,20 @@ public class PlayerAnimation : MonoBehaviour
     {
         if (Input.GetButtonDown(alternateFireButton) && !menuManager.tuningMenu.activeSelf)
         {
-            if (projectileSpawn.typeOfGun == ShootProjectile.gunType.Auto)
+            if (altAttackDropdown.value == 0)
             {
-                if (altAttackDropdown.value == 0)
-                {
-                    isScoped = !isScoped;
-                    GetComponent<Animator>().SetBool("Scoped", isScoped);
+                isScoped = !isScoped;
+                GetComponent<Animator>().SetBool("Scoped", isScoped);
 
-                    if (isScoped && scopeOverlay != null)
-                        StartCoroutine(OnScope());
-                    else if (!isScoped && scopeOverlay != null)
-                        OnUnscope();
-                }
-                else if (altAttackDropdown.value == 1)
-                {
-                    if (!isMeleeing)
-                        StartCoroutine(OnMelee());
-                }
+                if (isScoped && scopeOverlay != null)
+                    StartCoroutine(OnScope());
+                else if (!isScoped && scopeOverlay != null)
+                    OnUnscope();
+            }
+            else if (altAttackDropdown.value == 1)
+            {
+                if (!isMeleeing)
+                    StartCoroutine(OnMelee());
             }
         }
     }

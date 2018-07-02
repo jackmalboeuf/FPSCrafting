@@ -3,8 +3,7 @@ using System.Collections;
 
 public class CursorLock : MonoBehaviour
 {
-    [SerializeField]
-    ShootProjectile projectileSpawn;
+    public ShootProjectile projectileSpawn;
 
     bool isCursorLocked;
 
@@ -26,7 +25,7 @@ public class CursorLock : MonoBehaviour
 
     void CheckInput()
     {
-        if (Input.GetButtonDown("Cancel")/* || Input.GetButtonDown("Menu")*/)
+        if (Input.GetButtonDown("Cancel"))
         {
             ToggleCursorState();
         }
