@@ -412,6 +412,11 @@ public class ShootProjectile : MonoBehaviour
                     bullet.AddForce(transform.forward * bulletVelocity);
                 }
 
+                if (typeOfGun == gunType.SemiAuto|| typeOfGun == gunType.Lazer)
+                {
+                    //recoil
+                }
+
                 if (usesOverheat)
                 {
                     float energyAmount = maximumEnergy / energy;
