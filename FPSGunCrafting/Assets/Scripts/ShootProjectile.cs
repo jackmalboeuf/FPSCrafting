@@ -100,6 +100,9 @@ public class ShootProjectile : MonoBehaviour
     bool usesOverheat;
     [SerializeField]
     bool usesReload;
+    //[SerializeField]
+    public AnimationCurve recoilCurve = AnimationCurve.EaseInOut(0, 0, 0.5f, 0.5f);
+    AnimationCurve recoilReductionCurve = AnimationCurve.Linear(0, 0.5f, 0.2f, 0);
 
     [HideInInspector]
     public enum gunType { Auto = 0, SemiAuto = 1, Lazer = 2 }
@@ -127,7 +130,9 @@ public class ShootProjectile : MonoBehaviour
     public bool bulletDropOn = false;
     [HideInInspector]
     public float currentEnergy;
-    
+    //[HideInInspector]
+    public float recoilAngle;
+
     float fireRate = 0.3f;
     float accuracy = 5;
     float bulletVelocity = 5000;
@@ -151,7 +156,13 @@ public class ShootProjectile : MonoBehaviour
     bool shotgunOn = false;
     float previousDropdown1;
     float previousDropdown2;
-
+    Vector3 kickbackSmoothDampVelocity;
+    float recoilSmoothDampVelocity;
+    float gunKickback = 0.05f;
+    Transform kickbackTransform;
+    float recoilCurveTime = 0;
+    float previousRecoilTime = 0;
+    
     void Awake()
     {
         isReloading = false;
@@ -165,6 +176,7 @@ public class ShootProjectile : MonoBehaviour
         overheatSlider.transform.GetChild(1).GetComponentInChildren<Image>().color = Color.white;
         previousDropdown1 = 0;
         previousDropdown2 = 0;
+        kickbackTransform = GetComponentInParent<PlayerAnimation>().transform;
 
         if (damageSlider != null && damageValueText != null)
         {
@@ -290,6 +302,27 @@ public class ShootProjectile : MonoBehaviour
         {
             Overheat();
         }
+
+        kickbackTransform.localPosition = Vector3.SmoothDamp(kickbackTransform.localPosition, new Vector3(0, -0.53f, 0), ref kickbackSmoothDampVelocity, 0.1f);
+        //recoilAngle = Mathf.SmoothDamp(recoilAngle, 0, ref recoilSmoothDampVelocity, 5 / fireRate + 0.2f);
+        recoilCurveTime += Time.deltaTime;
+        recoilAngle = previousRecoilTime + recoilCurve.Evaluate(recoilCurveTime);
+
+        if (typeOfGun == gunType.SemiAuto)
+        {
+            
+        }
+        else if (typeOfGun == gunType.Auto)
+        {
+            if (recoilCurveTime >= recoilCurve.keys[2].time)
+            {
+                //previousRecoilTime = recoilReductionCurve.Evaluate(recoilCurveTime);
+                //previousRecoilTime = recoilCurve.Evaluate(recoilCurveTime);
+                //recoilCurve.keys[recoilCurve.length - 1].value = 0;
+                //Keyframe zeroKey = new Keyframe(recoilCurve.keys[recoilCurve.length - 1].time + recoilCurveTime, 0);
+                //recoilCurve.MoveKey(recoilCurve.length - 1, zeroKey);
+            }
+        }
     }
 
     void FireProjectile()
@@ -412,10 +445,16 @@ public class ShootProjectile : MonoBehaviour
                     bullet.AddForce(transform.forward * bulletVelocity);
                 }
 
-                if (typeOfGun == gunType.SemiAuto|| typeOfGun == gunType.Lazer)
+                if (typeOfGun == gunType.SemiAuto|| typeOfGun == gunType.Auto)
                 {
-                    //recoil
+                    //recoilAngle += 5;
+                    recoilAngle = Mathf.Clamp(recoilAngle, 0, 70);
+                    previousRecoilTime = recoilAngle;
+                    recoilCurveTime = 0;
                 }
+
+                kickbackTransform = GetComponentInParent<PlayerAnimation>().transform;
+                kickbackTransform.localPosition -= Vector3.forward * gunKickback;
 
                 if (usesOverheat)
                 {

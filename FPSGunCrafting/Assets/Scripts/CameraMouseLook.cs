@@ -5,13 +5,19 @@ public class CameraMouseLook : MonoBehaviour
 {
     enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
 
-    [SerializeField] RotationAxes axes = RotationAxes.MouseXAndY;
+    [SerializeField]
+    RotationAxes axes = RotationAxes.MouseXAndY;
     public float sensitivityX = 3F;
     public float sensitivityY = 3F;
-    [SerializeField] float minimumX = -360F;
-    [SerializeField] float maximumX = 360F;
-    [SerializeField] float minimumY = -90F;
-    [SerializeField] float maximumY = 90F;
+    [SerializeField]
+    float minimumX = -360F;
+    [SerializeField]
+    float maximumX = 360F;
+    [SerializeField]
+    float minimumY = -90F;
+    [SerializeField]
+    float maximumY = 90F;
+    public ShootProjectile projectileSpawn;
 
     float rotationX = 0F;
     float rotationY = 0F;
@@ -43,7 +49,8 @@ public class CameraMouseLook : MonoBehaviour
             rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
             rotationY = ClampAngle(rotationY, minimumY, maximumY);
             Quaternion yQuaternion = Quaternion.AngleAxis(-rotationY, Vector3.right);
-            transform.localRotation = originalRotation * yQuaternion;
+            Quaternion recoilQuaternion = Quaternion.AngleAxis(-projectileSpawn.recoilAngle, Vector3.right);
+            transform.localRotation = originalRotation * yQuaternion * recoilQuaternion;
         }
     }
 

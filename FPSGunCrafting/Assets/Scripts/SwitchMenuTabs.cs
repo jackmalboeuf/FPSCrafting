@@ -13,6 +13,8 @@ public class SwitchMenuTabs : MonoBehaviour
     ShootProjectile projectileSpawn;
     [SerializeField]
     CursorLock cLock;
+    [SerializeField]
+    CameraMouseLook playerCamera;
 
     public void PressTabButton()
     {
@@ -30,6 +32,7 @@ public class SwitchMenuTabs : MonoBehaviour
         tuningPanel.SetActive(true);
         scopeGunArms.SetActive(true);
         cLock.projectileSpawn = projectileSpawn;
+        playerCamera.projectileSpawn = projectileSpawn;
         projectileSpawn.currentEnergy = 0;
     }
 }
