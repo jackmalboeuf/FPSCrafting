@@ -24,7 +24,8 @@ public class ToolTip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         MeleeDamageDesc = 8,
         ExplosionSizeDesc = 9,
         DamageMultiplierDesc = 10,
-        AdditionalBulletsDesc = 11
+        AdditionalBulletsDesc = 11,
+        StabilityDesc = 12
     }
 
     Text toolTipText;
@@ -107,6 +108,10 @@ public class ToolTip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         else if (TTString == toolTipString.AdditionalBulletsDesc)
         {
             toolTipText.text = "Number of additional bullets fired. ";
+        }
+        else if (TTString == toolTipString.StabilityDesc)
+        {
+            toolTipText.text = "Amount of recoil when firing. ";
         }
     }
 }

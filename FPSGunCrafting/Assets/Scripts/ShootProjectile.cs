@@ -9,6 +9,8 @@ public class ShootProjectile : MonoBehaviour
     [SerializeField]
     Rigidbody projectile;
     [SerializeField]
+    LineRenderer lazerLineRenderer;
+    [SerializeField]
     Camera playerCamera;
     [SerializeField]
     string fireButton;
@@ -26,6 +28,8 @@ public class ShootProjectile : MonoBehaviour
     Slider rangeSlider;
     [SerializeField]
     Slider accuracySlider;
+    [SerializeField]
+    Slider stabilitySlider;
     [SerializeField]
     Slider energySlider;
     [SerializeField]
@@ -60,6 +64,8 @@ public class ShootProjectile : MonoBehaviour
     Text rangeValueText;
     [SerializeField]
     Text accuracyValueText;
+    [SerializeField]
+    Text stabilityValueText;
     [SerializeField]
     Text energyValueText;
     [SerializeField]
@@ -100,9 +106,8 @@ public class ShootProjectile : MonoBehaviour
     bool usesOverheat;
     [SerializeField]
     bool usesReload;
-    //[SerializeField]
-    public AnimationCurve recoilCurve = AnimationCurve.EaseInOut(0, 0, 0.5f, 0.5f);
-    AnimationCurve recoilReductionCurve = AnimationCurve.Linear(0, 0.5f, 0.2f, 0);
+    [SerializeField]
+    AnimationCurve recoilCurve = AnimationCurve.EaseInOut(0, 0, 0.5f, 0.5f);
 
     [HideInInspector]
     public enum gunType { Auto = 0, SemiAuto = 1, Lazer = 2 }
@@ -130,11 +135,16 @@ public class ShootProjectile : MonoBehaviour
     public bool bulletDropOn = false;
     [HideInInspector]
     public float currentEnergy;
-    //[HideInInspector]
+    [HideInInspector]
     public float recoilAngle;
+    [HideInInspector]
+    public float yMin = -90;
+    [HideInInspector]
+    public float yMax = 90;
 
     float fireRate = 0.3f;
     float accuracy = 5;
+    float stability = 10;
     float bulletVelocity = 5000;
     float size = 1;
     float magazineSize = 1;
@@ -162,6 +172,7 @@ public class ShootProjectile : MonoBehaviour
     Transform kickbackTransform;
     float recoilCurveTime = 0;
     float previousRecoilTime = 0;
+    float previousRecoilAngle;
     
     void Awake()
     {
@@ -200,6 +211,12 @@ public class ShootProjectile : MonoBehaviour
         {
             accuracySlider.value = FindHalfwayPoint(accuracySlider.minValue, accuracySlider.maxValue);
             ChangeAccuracy();
+        }
+
+        if (stabilitySlider != null && stabilityValueText != null)
+        {
+            stabilitySlider.value = FindHalfwayPoint(stabilitySlider.minValue, stabilitySlider.maxValue);
+            ChangeStability();
         }
 
         if (energySlider != null && energyValueText != null)
@@ -304,23 +321,24 @@ public class ShootProjectile : MonoBehaviour
         }
 
         kickbackTransform.localPosition = Vector3.SmoothDamp(kickbackTransform.localPosition, new Vector3(0, -0.53f, 0), ref kickbackSmoothDampVelocity, 0.1f);
-        //recoilAngle = Mathf.SmoothDamp(recoilAngle, 0, ref recoilSmoothDampVelocity, 5 / fireRate + 0.2f);
-        recoilCurveTime += Time.deltaTime;
-        recoilAngle = previousRecoilTime + recoilCurve.Evaluate(recoilCurveTime);
 
-        if (typeOfGun == gunType.SemiAuto)
+        if (typeOfGun == gunType.SemiAuto || typeOfGun == gunType.Lazer)
         {
-            
+            recoilCurveTime += Time.deltaTime;
+            previousRecoilAngle = recoilAngle;
+            recoilAngle = previousRecoilTime + recoilCurve.Evaluate(recoilCurveTime);
         }
-        else if (typeOfGun == gunType.Auto)
+
+        if (recoilAngle != previousRecoilAngle)
         {
-            if (recoilCurveTime >= recoilCurve.keys[2].time)
+            yMin = -90;
+            yMax = 90;
+            yMin -= recoilAngle;
+            yMax -= recoilAngle;
+
+            if (recoilAngle >= 359)
             {
-                //previousRecoilTime = recoilReductionCurve.Evaluate(recoilCurveTime);
-                //previousRecoilTime = recoilCurve.Evaluate(recoilCurveTime);
-                //recoilCurve.keys[recoilCurve.length - 1].value = 0;
-                //Keyframe zeroKey = new Keyframe(recoilCurve.keys[recoilCurve.length - 1].time + recoilCurveTime, 0);
-                //recoilCurve.MoveKey(recoilCurve.length - 1, zeroKey);
+                recoilAngle = 0;
             }
         }
     }
@@ -365,6 +383,30 @@ public class ShootProjectile : MonoBehaviour
                 {
                     bullet = Instantiate(projectile, transform.position, transform.rotation, null) as Rigidbody;
                     bullet.transform.localScale = new Vector3(bullet.transform.localScale.x * size, bullet.transform.localScale.y * size, bullet.transform.localScale.z * size);
+                }
+
+                if (typeOfGun == gunType.Lazer)
+                {
+                    RaycastHit lazerRayHit;
+                    Ray lazerRay = new Ray(transform.position, transform.forward);
+
+                    if (Physics.Raycast(lazerRay, out lazerRayHit, Vector3.Distance(transform.position, rangeEndPoint)) && lazerRayHit.collider.tag != "Damager")
+                    {
+                        LineRenderer lazerBeam = Instantiate(lazerLineRenderer);
+                        lazerBeam.SetPosition(0, transform.position);
+                        lazerBeam.SetPosition(1, lazerRayHit.point);
+
+                        if (lazerRayHit.collider.GetComponent<Damagable>())
+                        {
+                            lazerRayHit.collider.GetComponent<Damagable>().TakeDamage(damage);
+                        }
+                    }
+                    else
+                    {
+                        LineRenderer lazerBeam = Instantiate(lazerLineRenderer);
+                        lazerBeam.SetPosition(0, transform.position);
+                        lazerBeam.SetPosition(1, lookRay.GetPoint(distance));
+                    }
                 }
 
                 if (energyBoostOn)
@@ -445,10 +487,13 @@ public class ShootProjectile : MonoBehaviour
                     bullet.AddForce(transform.forward * bulletVelocity);
                 }
 
-                if (typeOfGun == gunType.SemiAuto|| typeOfGun == gunType.Auto)
+                if (typeOfGun == gunType.SemiAuto|| typeOfGun == gunType.Lazer)
                 {
-                    //recoilAngle += 5;
-                    recoilAngle = Mathf.Clamp(recoilAngle, 0, 70);
+                    //recoilAngle = Mathf.Clamp(recoilAngle, 0, 90);
+                    Keyframe recoilHeightKey = new Keyframe(recoilCurve.keys[1].time, stability);
+                    recoilCurve.MoveKey(1, recoilHeightKey);
+                    Keyframe recoilLengthKey = new Keyframe(stability / 10, recoilCurve.keys[2].value);
+                    recoilCurve.MoveKey(2, recoilLengthKey);
                     previousRecoilTime = recoilAngle;
                     recoilCurveTime = 0;
                 }
@@ -553,6 +598,8 @@ public class ShootProjectile : MonoBehaviour
             damage = Mathf.Round(Mathf.Lerp(5, 50, damageSlider.normalizedValue));
         if (typeOfGun == gunType.SemiAuto)
             damage = Mathf.Round(Mathf.Lerp(10, 100, damageSlider.normalizedValue));
+        if (typeOfGun == gunType.Lazer)
+            damage = Mathf.Round(Mathf.Lerp(7, 70, damageSlider.normalizedValue));
 
         damageValueText.text = damage.ToString();
     }
@@ -563,6 +610,8 @@ public class ShootProjectile : MonoBehaviour
             fireRate = Mathf.Round(Mathf.Lerp(10, 100, fireRateSlider.normalizedValue));
         if (typeOfGun == gunType.SemiAuto)
             fireRate = Mathf.Round(Mathf.Lerp(5, 50, fireRateSlider.normalizedValue));
+        if (typeOfGun == gunType.Lazer)
+            fireRate = Mathf.Round(Mathf.Lerp(7, 70, fireRateSlider.normalizedValue));
 
         if (bulletSpreadOn)
         {
@@ -580,8 +629,14 @@ public class ShootProjectile : MonoBehaviour
 
     public void ChangeAccuracy()
     {
-        accuracy = Mathf.Lerp(5, 0, accuracySlider.normalizedValue);
+        accuracy = Mathf.Lerp(5, 1, accuracySlider.normalizedValue);
         accuracyValueText.text = (Mathf.Round(100 * accuracy) / 100).ToString();
+    }
+
+    public void ChangeStability()
+    {
+        stability = Mathf.Lerp(10, 2, stabilitySlider.normalizedValue);
+        stabilityValueText.text = (Mathf.Round(100 * stability) / 100).ToString();
     }
 
     public void ChangeEnergy()

@@ -46,6 +46,11 @@ public class CameraMouseLook : MonoBehaviour
         }
         else
         {
+            if (projectileSpawn.typeOfGun == ShootProjectile.gunType.SemiAuto|| projectileSpawn.typeOfGun == ShootProjectile.gunType.Lazer)
+            {
+                minimumY = projectileSpawn.yMin;
+                maximumY = projectileSpawn.yMax;
+            }
             rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
             rotationY = ClampAngle(rotationY, minimumY, maximumY);
             Quaternion yQuaternion = Quaternion.AngleAxis(-rotationY, Vector3.right);

@@ -14,6 +14,8 @@ public class SliderLimit : MonoBehaviour
     [SerializeField]
     Slider accuracySlider;
     [SerializeField]
+    Slider stabilitySlider;
+    [SerializeField]
     Slider energySlider;
     [SerializeField]
     Slider cooldownSpeedSlider;
@@ -47,14 +49,25 @@ public class SliderLimit : MonoBehaviour
 
     private void Start()
     {
-        sliders.Add(damageSlider);
-        sliders.Add(fireRateSlider);
-        sliders.Add(rangeSlider);
-        sliders.Add(accuracySlider);
-        sliders.Add(energySlider);
-        sliders.Add(cooldownSpeedSlider);
-        sliders.Add(bulletVelocitySlider);
-        sliders.Add(zoomDistanceSlider);
+        if (damageSlider != null)
+            sliders.Add(damageSlider);
+        if (fireRateSlider != null)
+            sliders.Add(fireRateSlider);
+        if (rangeSlider != null)
+            sliders.Add(rangeSlider);
+        if (accuracySlider != null)
+            sliders.Add(accuracySlider);
+        if (stabilitySlider != null)
+            sliders.Add(stabilitySlider);
+        if (energySlider != null)
+            sliders.Add(energySlider);
+        if (cooldownSpeedSlider != null)
+            sliders.Add(cooldownSpeedSlider);
+        if (bulletVelocitySlider != null)
+            sliders.Add(bulletVelocitySlider);
+        if (zoomDistanceSlider != null)
+            sliders.Add(zoomDistanceSlider);
+
 
         UpdateLimitText();
         shouldChangeIndex = true;
@@ -142,6 +155,18 @@ public class SliderLimit : MonoBehaviour
             sliders.Insert(0, accuracySlider);
         }
         
+        AddCurrentTotal();
+        LimitSliders();
+    }
+
+    public void OnStabilityValueChanged()
+    {
+        if (shouldChangeIndex)
+        {
+            sliders.Remove(stabilitySlider);
+            sliders.Insert(0, stabilitySlider);
+        }
+
         AddCurrentTotal();
         LimitSliders();
     }

@@ -84,6 +84,8 @@ public class PlayerAnimation : MonoBehaviour
         reticle.SetActive(true);
         menuManager.canShowMenu = true;
 
+        playerMovement.GetComponent<CameraMouseLook>().sensitivityX = 3;
+        playerMovement.transform.GetChild(0).GetComponent<CameraMouseLook>().sensitivityY = 3;
         mainCamera.fieldOfView = unscopedFOV;
     }
 
