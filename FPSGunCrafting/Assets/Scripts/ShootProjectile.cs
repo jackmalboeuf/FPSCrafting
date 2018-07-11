@@ -173,6 +173,8 @@ public class ShootProjectile : MonoBehaviour
     float recoilCurveTime = 0;
     float previousRecoilTime = 0;
     float previousRecoilAngle;
+    bool canRepeat = true;
+    List<Coroutine> cooldownCoroutines = new List<Coroutine>();
     
     void Awake()
     {
@@ -407,6 +409,95 @@ public class ShootProjectile : MonoBehaviour
                         lazerBeam.SetPosition(0, transform.position);
                         lazerBeam.SetPosition(1, lookRay.GetPoint(distance));
                     }
+
+                    if (shotgunOn)
+                    {
+                        List<RaycastHit> rayHits = new List<RaycastHit>();
+                        RaycastHit rayHit1 = new RaycastHit();
+                        RaycastHit rayHit2 = new RaycastHit();
+                        RaycastHit rayHit3 = new RaycastHit();
+                        RaycastHit rayHit4 = new RaycastHit();
+                        RaycastHit rayHit5 = new RaycastHit();
+                        RaycastHit rayHit6 = new RaycastHit();
+                        RaycastHit rayHit7 = new RaycastHit();
+                        RaycastHit rayHit8 = new RaycastHit();
+                        rayHits.Add(rayHit1);
+                        rayHits.Add(rayHit2);
+                        rayHits.Add(rayHit3);
+                        rayHits.Add(rayHit4);
+                        rayHits.Add(rayHit5);
+                        rayHits.Add(rayHit6);
+                        rayHits.Add(rayHit7);
+                        rayHits.Add(rayHit8);
+
+                        List<Ray> rays = new List<Ray>();
+                        Ray ray1 = new Ray(transform.position, transform.forward);
+                        Ray ray2 = new Ray(transform.position, transform.forward);
+                        Ray ray3 = new Ray(transform.position, transform.forward);
+                        Ray ray4 = new Ray(transform.position, transform.forward);
+                        Ray ray5 = new Ray(transform.position, transform.forward);
+                        Ray ray6 = new Ray(transform.position, transform.forward);
+                        Ray ray7 = new Ray(transform.position, transform.forward);
+                        Ray ray8 = new Ray(transform.position, transform.forward);
+                        rays.Add(ray1);
+                        rays.Add(ray2);
+                        rays.Add(ray3);
+                        rays.Add(ray4);
+                        rays.Add(ray5);
+                        rays.Add(ray6);
+                        rays.Add(ray7);
+                        rays.Add(ray8);
+
+                        /*List<float> xRandomNums = new List<float>();
+                        xRandomNums.Add(Random.Range(0, accuracy));
+                        xRandomNums.Add(Random.Range(0, accuracy));
+                        xRandomNums.Add(Random.Range(0, accuracy));
+                        xRandomNums.Add(Random.Range(0, accuracy));
+                        xRandomNums.Add(Random.Range(0, accuracy));
+                        xRandomNums.Add(Random.Range(0, accuracy));
+                        xRandomNums.Add(Random.Range(0, accuracy));
+                        xRandomNums.Add(Random.Range(0, accuracy));
+
+                        List<float> zRandomNums = new List<float>();
+                        zRandomNums.Add(Random.Range(0, 359));
+                        zRandomNums.Add(Random.Range(0, 359));
+                        zRandomNums.Add(Random.Range(0, 359));
+                        zRandomNums.Add(Random.Range(0, 359));
+                        zRandomNums.Add(Random.Range(0, 359));
+                        zRandomNums.Add(Random.Range(0, 359));
+                        zRandomNums.Add(Random.Range(0, 359));
+                        zRandomNums.Add(Random.Range(0, 359));*/
+                        
+                        for (int i = 0; i < numberOfAdditionalBullets; i++)
+                        {
+                            float xRand = Random.Range(0, accuracy);
+                            float zRand = Random.Range(0, 359);
+
+                            transform.localEulerAngles = new Vector3(xRand, transform.localEulerAngles.y, transform.localEulerAngles.z);
+                            transform.Rotate(transform.parent.forward, zRand, Space.World);
+
+                            RaycastHit hitRay = rayHits[i];
+
+                            if (Physics.Raycast(rays[i], out hitRay, Vector3.Distance(transform.position, rangeEndPoint)) && hitRay.collider.tag != "Damager")
+                            {
+                                
+                                LineRenderer lazerBeam = Instantiate(lazerLineRenderer);
+                                lazerBeam.SetPosition(0, transform.position);
+                                lazerBeam.SetPosition(1, hitRay.point);
+                                print(hitRay.point);
+                                if (hitRay.collider.GetComponent<Damagable>())
+                                {
+                                    hitRay.collider.GetComponent<Damagable>().TakeDamage(damage);
+                                }
+                            }
+                            else
+                            {
+                                LineRenderer lazerBeam = Instantiate(lazerLineRenderer);
+                                lazerBeam.SetPosition(0, transform.position);
+                                lazerBeam.SetPosition(1, hitRay.point);
+                            }
+                        }
+                    }
                 }
 
                 if (energyBoostOn)
@@ -415,7 +506,7 @@ public class ShootProjectile : MonoBehaviour
                     damage += Mathf.Round(currentEnergy * (energyBoost - 1) * 0.01f * damage);
                 }
 
-                if (bulletSpreadOn)
+                if (bulletSpreadOn || repeaterOn)
                 {
                     List<Rigidbody> bullets = new List<Rigidbody>();
                     Rigidbody bullet1 = projectile;
@@ -436,18 +527,35 @@ public class ShootProjectile : MonoBehaviour
                     bullets.Add(bullet7);
                     bullets.Add(bullet8);
 
-                    float plusOrMinus = -1;
-                    
-                    for (int i = 1; i <= numberOfAdditionalBullets; i++)
+                    if (bulletSpreadOn)
                     {
-                        plusOrMinus *= -1;
-                        bullets[i - 1] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z + (plusOrMinus * 0.1f * i)), transform.rotation, null) as Rigidbody;
+                        float plusOrMinus = -1;
+                        
+                        for (int i = 1; i <= numberOfAdditionalBullets; i++)
+                        {
+                            plusOrMinus *= -1;
+                            bullets[i - 1] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z + (plusOrMinus * 0.1f * i)), transform.rotation, null) as Rigidbody;
+                        }
+                    }
+
+                    if (repeaterOn)
+                    {
+                        if (canRepeat)
+                        {
+                            float pauseTime = 0.03f;
+                            float waitTime = numberOfAdditionalBullets * pauseTime;
+
+                            for (int i = 1; i <= numberOfAdditionalBullets; i++)
+                            {
+                                bullets[i - 1] = Instantiate(bullet, transform.position, transform.rotation, null) as Rigidbody;
+                                StartCoroutine(RepeaterBullets(waitTime - i * pauseTime, bullets[i - 1]));
+                            }
+                        }
                     }
 
                     ChangeDamage();
                     ChangeFireRate();
                     ChangeRange();
-                    ChangeAccuracy();
                     ChangeEnergy();
                     ChangeCooldownSpeed();
                     ChangeBulletVelocity();
@@ -458,7 +566,7 @@ public class ShootProjectile : MonoBehaviour
                         bullets[i].GetComponent<ProjectileBehavior>().projectileRange = distance;
                         bullets[i].GetComponent<ProjectileBehavior>().projectileDamageFallOff = range;
                         bullets[i].GetComponent<ProjectileBehavior>().projectileEndPoint = rangeEndPoint;
-                        bullets[i].AddForce(transform.forward * bulletVelocity);
+                        //bullets[i].AddForce(transform.forward * bulletVelocity);
                     }
                 }
 
@@ -510,14 +618,22 @@ public class ShootProjectile : MonoBehaviour
                     if (currentEnergy >= maximumEnergy)
                     {
                         currentEnergy = maximumEnergy;
-                        StopAllCoroutines();
-                        StartCoroutine(Cooldown(true));
+
+                        for (int i = 0; i < cooldownCoroutines.Count; i++)
+                        {
+                            StopCoroutine(cooldownCoroutines[i]);
+                        }
+                        cooldownCoroutines.Add(StartCoroutine(Cooldown(true)));
                     }
                     else if (currentEnergy < maximumEnergy)
                     {
                         isReducingEnergy = false;
-                        StopAllCoroutines();
-                        StartCoroutine(Cooldown(false));
+
+                        for (int i = 0; i < cooldownCoroutines.Count; i++)
+                        {
+                            StopCoroutine(cooldownCoroutines[i]);
+                        }
+                        cooldownCoroutines.Add(StartCoroutine(Cooldown(false)));
                     }
                 }
                 
@@ -592,6 +708,13 @@ public class ShootProjectile : MonoBehaviour
             isReducingEnergy = false;
     }
 
+    IEnumerator RepeaterBullets(float waitTime, Rigidbody bullet)
+    {
+        yield return new WaitForSeconds(waitTime);
+        ChangeBulletVelocity();
+        bullet.AddForce(transform.forward * bulletVelocity);
+    }
+
     public void ChangeDamage()
     {
         if (typeOfGun == gunType.Auto)
@@ -600,6 +723,11 @@ public class ShootProjectile : MonoBehaviour
             damage = Mathf.Round(Mathf.Lerp(10, 100, damageSlider.normalizedValue));
         if (typeOfGun == gunType.Lazer)
             damage = Mathf.Round(Mathf.Lerp(7, 70, damageSlider.normalizedValue));
+
+        if (repeaterOn)
+        {
+            damage = Mathf.Round(damage / numberOfAdditionalBullets);
+        }
 
         damageValueText.text = damage.ToString();
     }
@@ -624,6 +752,12 @@ public class ShootProjectile : MonoBehaviour
     public void ChangeRange()
     {
         range = Mathf.Round(Mathf.Lerp(1, 100, rangeSlider.normalizedValue));
+
+        if (shotgunOn)
+        {
+            range = Mathf.Round(fireRate / numberOfAdditionalBullets);
+        }
+
         rangeValueText.text = range.ToString();
     }
 
@@ -712,11 +846,17 @@ public class ShootProjectile : MonoBehaviour
         }
         else if (typeOfGun == gunType.SemiAuto)
         {
-
+            numberOfAdditionalBullets = Mathf.Round(Mathf.Lerp(1, 4, trait1cSlider.normalizedValue));
+            trait1cValueText1.text = numberOfAdditionalBullets.ToString();
+            trait1cValueText2.text = "1/" + numberOfAdditionalBullets;
+            ChangeDamage();
         }
         else if (typeOfGun == gunType.Lazer)
         {
-
+            numberOfAdditionalBullets = Mathf.Round(Mathf.Lerp(1, 8, trait1cSlider.normalizedValue));
+            trait1cValueText1.text = numberOfAdditionalBullets.ToString();
+            trait1cValueText2.text = "1/" + numberOfAdditionalBullets;
+            ChangeRange();
         }
     }
 
@@ -743,11 +883,17 @@ public class ShootProjectile : MonoBehaviour
         }
         else if (typeOfGun == gunType.SemiAuto)
         {
-
+            numberOfAdditionalBullets = Mathf.Round(Mathf.Lerp(1, 4, trait1cSlider.normalizedValue));
+            trait1cValueText1.text = numberOfAdditionalBullets.ToString();
+            trait1cValueText2.text = "1/" + numberOfAdditionalBullets;
+            ChangeDamage();
         }
         else if (typeOfGun == gunType.Lazer)
         {
-
+            numberOfAdditionalBullets = Mathf.Round(Mathf.Lerp(1, 8, trait1cSlider.normalizedValue));
+            trait1cValueText1.text = numberOfAdditionalBullets.ToString();
+            trait1cValueText2.text = "1/" + numberOfAdditionalBullets;
+            ChangeRange();
         }
     }
 
