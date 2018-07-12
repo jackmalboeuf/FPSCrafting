@@ -389,85 +389,10 @@ public class ShootProjectile : MonoBehaviour
 
                 if (typeOfGun == gunType.Lazer)
                 {
-                    RaycastHit lazerRayHit;
-                    Ray lazerRay = new Ray(transform.position, transform.forward);
-
-                    if (Physics.Raycast(lazerRay, out lazerRayHit, Vector3.Distance(transform.position, rangeEndPoint)) && lazerRayHit.collider.tag != "Damager")
-                    {
-                        LineRenderer lazerBeam = Instantiate(lazerLineRenderer);
-                        lazerBeam.SetPosition(0, transform.position);
-                        lazerBeam.SetPosition(1, lazerRayHit.point);
-
-                        if (lazerRayHit.collider.GetComponent<Damagable>())
-                        {
-                            lazerRayHit.collider.GetComponent<Damagable>().TakeDamage(damage);
-                        }
-                    }
-                    else
-                    {
-                        LineRenderer lazerBeam = Instantiate(lazerLineRenderer);
-                        lazerBeam.SetPosition(0, transform.position);
-                        lazerBeam.SetPosition(1, lookRay.GetPoint(distance));
-                    }
-
+                    CastRay(transform.position, transform.forward);
+                    
                     if (shotgunOn)
                     {
-                        List<RaycastHit> rayHits = new List<RaycastHit>();
-                        RaycastHit rayHit1 = new RaycastHit();
-                        RaycastHit rayHit2 = new RaycastHit();
-                        RaycastHit rayHit3 = new RaycastHit();
-                        RaycastHit rayHit4 = new RaycastHit();
-                        RaycastHit rayHit5 = new RaycastHit();
-                        RaycastHit rayHit6 = new RaycastHit();
-                        RaycastHit rayHit7 = new RaycastHit();
-                        RaycastHit rayHit8 = new RaycastHit();
-                        rayHits.Add(rayHit1);
-                        rayHits.Add(rayHit2);
-                        rayHits.Add(rayHit3);
-                        rayHits.Add(rayHit4);
-                        rayHits.Add(rayHit5);
-                        rayHits.Add(rayHit6);
-                        rayHits.Add(rayHit7);
-                        rayHits.Add(rayHit8);
-
-                        List<Ray> rays = new List<Ray>();
-                        Ray ray1 = new Ray(transform.position, transform.forward);
-                        Ray ray2 = new Ray(transform.position, transform.forward);
-                        Ray ray3 = new Ray(transform.position, transform.forward);
-                        Ray ray4 = new Ray(transform.position, transform.forward);
-                        Ray ray5 = new Ray(transform.position, transform.forward);
-                        Ray ray6 = new Ray(transform.position, transform.forward);
-                        Ray ray7 = new Ray(transform.position, transform.forward);
-                        Ray ray8 = new Ray(transform.position, transform.forward);
-                        rays.Add(ray1);
-                        rays.Add(ray2);
-                        rays.Add(ray3);
-                        rays.Add(ray4);
-                        rays.Add(ray5);
-                        rays.Add(ray6);
-                        rays.Add(ray7);
-                        rays.Add(ray8);
-
-                        /*List<float> xRandomNums = new List<float>();
-                        xRandomNums.Add(Random.Range(0, accuracy));
-                        xRandomNums.Add(Random.Range(0, accuracy));
-                        xRandomNums.Add(Random.Range(0, accuracy));
-                        xRandomNums.Add(Random.Range(0, accuracy));
-                        xRandomNums.Add(Random.Range(0, accuracy));
-                        xRandomNums.Add(Random.Range(0, accuracy));
-                        xRandomNums.Add(Random.Range(0, accuracy));
-                        xRandomNums.Add(Random.Range(0, accuracy));
-
-                        List<float> zRandomNums = new List<float>();
-                        zRandomNums.Add(Random.Range(0, 359));
-                        zRandomNums.Add(Random.Range(0, 359));
-                        zRandomNums.Add(Random.Range(0, 359));
-                        zRandomNums.Add(Random.Range(0, 359));
-                        zRandomNums.Add(Random.Range(0, 359));
-                        zRandomNums.Add(Random.Range(0, 359));
-                        zRandomNums.Add(Random.Range(0, 359));
-                        zRandomNums.Add(Random.Range(0, 359));*/
-                        
                         for (int i = 0; i < numberOfAdditionalBullets; i++)
                         {
                             float xRand = Random.Range(0, accuracy);
@@ -476,26 +401,7 @@ public class ShootProjectile : MonoBehaviour
                             transform.localEulerAngles = new Vector3(xRand, transform.localEulerAngles.y, transform.localEulerAngles.z);
                             transform.Rotate(transform.parent.forward, zRand, Space.World);
 
-                            RaycastHit hitRay = rayHits[i];
-
-                            if (Physics.Raycast(rays[i], out hitRay, Vector3.Distance(transform.position, rangeEndPoint)) && hitRay.collider.tag != "Damager")
-                            {
-                                
-                                LineRenderer lazerBeam = Instantiate(lazerLineRenderer);
-                                lazerBeam.SetPosition(0, transform.position);
-                                lazerBeam.SetPosition(1, hitRay.point);
-                                print(hitRay.point);
-                                if (hitRay.collider.GetComponent<Damagable>())
-                                {
-                                    hitRay.collider.GetComponent<Damagable>().TakeDamage(damage);
-                                }
-                            }
-                            else
-                            {
-                                LineRenderer lazerBeam = Instantiate(lazerLineRenderer);
-                                lazerBeam.SetPosition(0, transform.position);
-                                lazerBeam.SetPosition(1, hitRay.point);
-                            }
+                            CastRay(transform.position, transform.forward);
                         }
                     }
                 }
@@ -566,7 +472,9 @@ public class ShootProjectile : MonoBehaviour
                         bullets[i].GetComponent<ProjectileBehavior>().projectileRange = distance;
                         bullets[i].GetComponent<ProjectileBehavior>().projectileDamageFallOff = range;
                         bullets[i].GetComponent<ProjectileBehavior>().projectileEndPoint = rangeEndPoint;
-                        //bullets[i].AddForce(transform.forward * bulletVelocity);
+
+                        if (bulletSpreadOn)
+                            bullets[i].AddForce(transform.forward * bulletVelocity);
                     }
                 }
 
@@ -653,6 +561,38 @@ public class ShootProjectile : MonoBehaviour
         if (Input.GetButtonDown(reloadButton) && !isReloading && currentMagazineCount < magazineSize && usesReload)
         {
             StartCoroutine(Reload());
+        }
+    }
+
+    void CastRay(Vector3 start, Vector3 direction)
+    {
+        Ray lazerRay = new Ray(start, direction);
+        RaycastHit hit;
+        if (Physics.Raycast(lazerRay, out hit, Vector3.Distance(transform.position, rangeEndPoint)) && hit.collider.tag != "Damager")
+        {       
+            LineRenderer lazerBeam = Instantiate(lazerLineRenderer);
+            lazerBeam.SetPosition(0, transform.position);
+            lazerBeam.SetPosition(1, hit.point);   
+
+            if (hit.collider.GetComponent<Damagable>())
+            {
+                float fallOffStartDistance = range * 0.01f * distance;
+                float damageFallOffPeriod = distance - fallOffStartDistance;
+                float fallOffDistanceTraveled = 0;
+                if (Vector3.Distance(lazerRay.origin, hit.point) >= fallOffStartDistance)
+                {
+                    fallOffDistanceTraveled = Vector3.Distance(lazerRay.GetPoint(fallOffStartDistance), hit.point);
+                }
+                float damageFallOffPercent = fallOffDistanceTraveled / damageFallOffPeriod;
+                float lazerDamage = Mathf.Round(damage - damageFallOffPercent * 0.75f * damage);
+                hit.collider.GetComponent<Damagable>().TakeDamage(lazerDamage);
+            }
+        }
+        else
+        {
+            LineRenderer lazerBeam = Instantiate(lazerLineRenderer);
+            lazerBeam.SetPosition(0, transform.position);
+            lazerBeam.SetPosition(1, lazerRay.GetPoint(distance));
         }
     }
 
