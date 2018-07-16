@@ -110,7 +110,7 @@ MonoBehaviour:
   m_MinSize: {x: 817, y: 492}
   m_MaxSize: {x: 22012, y: 14042}
   vertical: 0
-  controlID: 11
+  controlID: 142
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -134,7 +134,7 @@ MonoBehaviour:
   m_MinSize: {x: 336, y: 492}
   m_MaxSize: {x: 14006, y: 14042}
   vertical: 1
-  controlID: 12
+  controlID: 143
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -186,7 +186,7 @@ MonoBehaviour:
   m_MinSize: {x: 336, y: 271}
   m_MaxSize: {x: 14006, y: 10021}
   vertical: 0
-  controlID: 38
+  controlID: 61
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -392,14 +392,14 @@ MonoBehaviour:
     width: 1769
     height: 912
   m_SceneLighting: 1
-  lastFramingTime: 105.93664768142149
-  m_2DMode: 1
+  lastFramingTime: 23007.01760195749
+  m_2DMode: 0
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 793.1741, y: 441.53433, z: 0}
+    m_Target: {x: 0, y: 0, z: 0}
     speed: 2
-    m_Value: {x: 793.1741, y: 441.53433, z: 0}
+    m_Value: {x: 0, y: 0, z: 0}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -422,18 +422,18 @@ MonoBehaviour:
       speed: 2
       m_Value: 0
   m_Rotation:
-    m_Target: {x: 0, y: 0, z: 0, w: 1}
+    m_Target: {x: -0.042750534, y: 0.9276568, z: -0.1121483, w: -0.35362825}
     speed: 2
-    m_Value: {x: 0, y: 0, z: 0, w: 1}
+    m_Value: {x: -0.042750426, y: 0.9276545, z: -0.11214802, w: -0.35362735}
   m_Size:
-    m_Target: 1017.7846
+    m_Target: 4.086774
     speed: 2
-    m_Value: 1017.7846
+    m_Value: 4.086774
   m_Ortho:
-    m_Target: 1
+    m_Target: 0
     speed: 2
-    m_Value: 1
-  m_LastSceneViewRotation: {x: -0.06516327, y: 0.93421906, z: -0.26491022, w: -0.2298065}
+    m_Value: 0
+  m_LastSceneViewRotation: {x: -0.08717229, y: 0.89959055, z: -0.21045254, w: -0.3726226}
   m_LastSceneViewOrtho: 0
   m_ReplacementShader: {fileID: 0}
   m_ReplacementString: 
@@ -547,18 +547,18 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/Scripts
+    - Assets/Prefabs
   m_ViewMode: 1
   m_StartGridSize: 57
   m_LastFolders:
-  - Assets/Scripts
+  - Assets/Prefabs
   m_LastFoldersGridSize: 57
   m_LastProjectPath: C:\Users\jack.malboeuf\Desktop\GitHub\FPSCrafting\FPSGunCrafting
   m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: de290000
-    m_LastClickedID: 10718
+    m_SelectedIDs: 422e0000
+    m_LastClickedID: 11842
     m_ExpandedIDs: 000000008c2900001a2c00001430000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -615,7 +615,7 @@ MonoBehaviour:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 1
-    m_ExpandedInstanceIDs: d6edfeff0ce8ffff827bffff342200000c22000074220000ca210000ce210000f8210000fc2100000222000004220000a43f0000102200001a22000026220000e4220000000000009c2500009a25000098590000885e0000cc7a000034c700004a4c0000
+    m_ExpandedInstanceIDs: d6edfeff0ce8ffff827bffff342200000c22000074220000ca210000ce210000f8210000fc2100000222000004220000a43f0000102200001a22000026220000e4220000000000009c2500009a25000098590000885e0000cc7a000034c700004a4c00000cfacbff
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -698,7 +698,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 1afcffff00000000423400009a340000aa3400007c360000e23600007a380000f63800000a3900007a3b0000863b0000523c0000643c00003c3e0000683e00004441000092410000124200007c460000aa46000094480000d6480000f8480000
+    m_ExpandedIDs: a0b7bdffea9ecbff5e85ccff5e77f7ff1afcffff00000000fc3200005e33000042340000aa3400007c360000d43700007a3800000a390000863b0000c23c0000243e00003c3e0000f0400000444100009241000012420000944200000a45000030450000b44500007c4600003e4700004c48000094480000d6480000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -778,7 +778,7 @@ MonoBehaviour:
   m_ScrollPosition: {x: 0, y: 0}
   m_InspectorMode: 0
   m_PreviewResizer:
-    m_CachedPref: -347
+    m_CachedPref: -264
     m_ControlHash: -371814159
     m_PrefName: Preview_InspectorPreview
   m_PreviewWindow: {fileID: 0}

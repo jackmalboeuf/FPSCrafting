@@ -13,7 +13,7 @@ public class PreventCollisionPassThrough : MonoBehaviour
     private float minimumExtent;
     private float partialExtent;
     private float sqrMinimumExtent;
-    private Vector3 previousPosition;
+    public Vector3 previousPosition;
     private Rigidbody myRigidbody;
     private Collider myCollider;
 
@@ -44,7 +44,7 @@ public class PreventCollisionPassThrough : MonoBehaviour
             {
                 if (!hitInfo.collider)
                     return;
-
+                
                 if (hitInfo.collider.isTrigger)
                     hitInfo.collider.SendMessage("OnTriggerEnter", myCollider);
 

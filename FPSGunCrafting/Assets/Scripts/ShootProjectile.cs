@@ -108,6 +108,10 @@ public class ShootProjectile : MonoBehaviour
     bool usesReload;
     [SerializeField]
     AnimationCurve recoilCurve = AnimationCurve.EaseInOut(0, 0, 0.5f, 0.5f);
+    [SerializeField]
+    GameObject aoeObject;
+    [SerializeField]
+    GameObject muzzleFlash;
 
     [HideInInspector]
     public enum gunType { Auto = 0, SemiAuto = 1, Lazer = 2 }
@@ -406,6 +410,9 @@ public class ShootProjectile : MonoBehaviour
                     }
                 }
 
+                //GameObject muzzleFlashObject = Instantiate(muzzleFlash, transform.position, transform.rotation, null) as GameObject;
+                //Destroy(muzzleFlashObject, 0.01f);
+
                 if (energyBoostOn)
                 {
                     damage = damageSlider.value;
@@ -484,18 +491,18 @@ public class ShootProjectile : MonoBehaviour
                     bullet.GetComponent<ProjectileBehavior>().projectileRange = distance;
                     bullet.GetComponent<ProjectileBehavior>().projectileDamageFallOff = range;
                     bullet.GetComponent<ProjectileBehavior>().projectileEndPoint = rangeEndPoint;
+
+                    if (AoEOn)
+                    {
+                        bullet.GetComponent<ProjectileBehavior>().projectileAoESize = AoESize;
+                        bullet.GetComponent<ProjectileBehavior>().projectileAoEOn = AoEOn;
+                    }
                 }
 
                 if (bulletDropOn)
                 {
                     bullet.GetComponent<ProjectileBehavior>().projectileDrop = bulletDrop;
                     bullet.GetComponent<ProjectileBehavior>().projectileDropOn = bulletDropOn;
-                }
-
-                if (AoEOn)
-                {
-                    bullet.GetComponent<ProjectileBehavior>().projectileAoESize = AoESize;
-                    bullet.GetComponent<ProjectileBehavior>().projectileAoEOn = AoEOn;
                 }
 
                 if (typeOfGun == gunType.Auto || typeOfGun == gunType.SemiAuto)
@@ -505,7 +512,6 @@ public class ShootProjectile : MonoBehaviour
 
                 if (typeOfGun == gunType.SemiAuto|| typeOfGun == gunType.Lazer)
                 {
-                    //recoilAngle = Mathf.Clamp(recoilAngle, 0, 90);
                     Keyframe recoilHeightKey = new Keyframe(recoilCurve.keys[1].time, stability);
                     recoilCurve.MoveKey(1, recoilHeightKey);
                     Keyframe recoilLengthKey = new Keyframe(stability / 10, recoilCurve.keys[2].value);
@@ -585,7 +591,17 @@ public class ShootProjectile : MonoBehaviour
                 }
                 float damageFallOffPercent = fallOffDistanceTraveled / damageFallOffPeriod;
                 float lazerDamage = Mathf.Round(damage - damageFallOffPercent * 0.75f * damage);
-                hit.collider.GetComponent<Damagable>().TakeDamage(lazerDamage);
+
+                if (!AoEOn)
+                {
+                    hit.collider.GetComponent<Damagable>().TakeDamage(lazerDamage);
+                }
+                else if (AoEOn && aoeObject != null)
+                {
+                    GameObject aoe = Instantiate(aoeObject, hit.point, transform.rotation, null) as GameObject;
+                    aoe.GetComponent<AoEDamage>().AoEDamageValue = lazerDamage;
+                    aoe.GetComponent<AoEDamage>().AoESize = AoESize;
+                }
             }
         }
         else
@@ -593,6 +609,13 @@ public class ShootProjectile : MonoBehaviour
             LineRenderer lazerBeam = Instantiate(lazerLineRenderer);
             lazerBeam.SetPosition(0, transform.position);
             lazerBeam.SetPosition(1, lazerRay.GetPoint(distance));
+
+            if (AoEOn)
+            {
+                GameObject aoe = Instantiate(aoeObject, lazerRay.GetPoint(distance), transform.rotation, null) as GameObject;
+                aoe.GetComponent<AoEDamage>().AoEDamageValue = damage;
+                aoe.GetComponent<AoEDamage>().AoESize = AoESize;
+            }
         }
     }
 

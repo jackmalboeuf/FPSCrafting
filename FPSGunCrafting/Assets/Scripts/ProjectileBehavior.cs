@@ -5,6 +5,8 @@ public class ProjectileBehavior : MonoBehaviour
 {
     [SerializeField]
     GameObject AoEObject;
+    [SerializeField]
+    GameObject dustParticle;
 
     public float projectileRange;
     public float projectileDamage;
@@ -81,6 +83,7 @@ public class ProjectileBehavior : MonoBehaviour
             }
             else if (!target.GetComponent<Damagable>() && target.gameObject.tag != "Player" && target.gameObject.tag != "Damager")
             {
+                GameObject dustObject = Instantiate(dustParticle, GetComponent<PreventCollisionPassThrough>().previousPosition, transform.rotation, null) as GameObject;
                 Destroy(gameObject);
             }
         }
@@ -121,7 +124,7 @@ public class ProjectileBehavior : MonoBehaviour
     {
         if (projectileAoEOn && projectileAoESize != null)
         {
-            GameObject AoE = Instantiate(AoEObject, transform.position, transform.rotation, null) as GameObject;
+            GameObject AoE = Instantiate(AoEObject, GetComponent<PreventCollisionPassThrough>().previousPosition, transform.rotation, null) as GameObject;
             AoE.GetComponent<AoEDamage>().AoEDamageValue = projectileDamage;
             AoE.GetComponent<AoEDamage>().AoESize = projectileAoESize;
         }

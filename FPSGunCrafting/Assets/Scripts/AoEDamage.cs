@@ -10,10 +10,15 @@ public class AoEDamage : MonoBehaviour
     {
         if (AoESize != null)
         {
+            Transform childParticle = transform.GetChild(0);
+
             transform.localScale = new Vector3(transform.localScale.x * AoESize, transform.localScale.y * AoESize, transform.localScale.z * AoESize);
+            childParticle.localScale = new Vector3(childParticle.localScale.x * AoESize, childParticle.localScale.y * AoESize, childParticle.localScale.z * AoESize);
         }
 
-        Destroy(gameObject, 0.2f);
+        Invoke("DeactivateCollider", 0.2f);
+
+        Destroy(gameObject, 0.5f);
     }
 
     void OnTriggerEnter(Collider collider)
@@ -25,5 +30,10 @@ public class AoEDamage : MonoBehaviour
                 collider.GetComponent<Damagable>().TakeDamage(AoEDamageValue);
             }
         }
+    }
+
+    void DeactivateCollider()
+    {
+        GetComponent<Collider>().enabled = false;
     }
 }
