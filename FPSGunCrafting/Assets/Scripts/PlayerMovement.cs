@@ -48,10 +48,10 @@ public class PlayerMovement : MonoBehaviour
             HandleMovement();
 
             // Jump
-            if (canJump && Input.GetButton("Jump"))
+            /*if (canJump && Input.GetButton("Jump"))
             {
                 rb.velocity = new Vector3(rb.velocity.x, CalculateJumpVerticalSpeed(), rb.velocity.z);
-            }
+            }*/
         }
 
         if (!grounded)

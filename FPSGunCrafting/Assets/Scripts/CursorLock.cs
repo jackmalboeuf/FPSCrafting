@@ -14,7 +14,7 @@ public class CursorLock : MonoBehaviour
 
     void Update()
     {
-        CheckInput();
+        //CheckInput();
         CheckIfCursorShouldBeLocked();
     }
 

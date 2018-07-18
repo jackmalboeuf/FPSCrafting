@@ -110,8 +110,6 @@ public class ShootProjectile : MonoBehaviour
     AnimationCurve recoilCurve = AnimationCurve.EaseInOut(0, 0, 0.5f, 0.5f);
     [SerializeField]
     GameObject aoeObject;
-    [SerializeField]
-    GameObject muzzleFlash;
 
     [HideInInspector]
     public enum gunType { Auto = 0, SemiAuto = 1, Lazer = 2 }
@@ -333,6 +331,8 @@ public class ShootProjectile : MonoBehaviour
             recoilCurveTime += Time.deltaTime;
             previousRecoilAngle = recoilAngle;
             recoilAngle = previousRecoilTime + recoilCurve.Evaluate(recoilCurveTime);
+            //recoilQuaternion = Quaternion.AngleAxis(-recoilAngle, Vector3.right);
+            //playerCamera.transform.localRotation = new Quaternion(1, 0, 0, 0) * recoilQuaternion;
         }
 
         if (recoilAngle != previousRecoilAngle)
@@ -344,6 +344,13 @@ public class ShootProjectile : MonoBehaviour
 
             if (recoilAngle >= 359)
             {
+                recoilAngle = 0;
+            }
+
+            if (yMin <= -359 || yMax <= -359)
+            {
+                yMin = -90;
+                yMax = 90;
                 recoilAngle = 0;
             }
         }
@@ -409,9 +416,6 @@ public class ShootProjectile : MonoBehaviour
                         }
                     }
                 }
-
-                //GameObject muzzleFlashObject = Instantiate(muzzleFlash, transform.position, transform.rotation, null) as GameObject;
-                //Destroy(muzzleFlashObject, 0.01f);
 
                 if (energyBoostOn)
                 {
@@ -732,7 +736,11 @@ public class ShootProjectile : MonoBehaviour
 
     public void ChangeStability()
     {
-        stability = Mathf.Lerp(10, 2, stabilitySlider.normalizedValue);
+        if (typeOfGun == gunType.SemiAuto)
+            stability = Mathf.Lerp(7, 2, stabilitySlider.normalizedValue);
+        if (typeOfGun == gunType.Lazer)
+            stability = Mathf.Lerp(5, 2, stabilitySlider.normalizedValue);
+
         stabilityValueText.text = (Mathf.Round(100 * stability) / 100).ToString();
     }
 
@@ -744,7 +752,7 @@ public class ShootProjectile : MonoBehaviour
 
     public void ChangeCooldownSpeed()
     {
-        cooldownSpeed = Mathf.Lerp(10, 0.5f, cooldownSpeedSlider.normalizedValue);
+        cooldownSpeed = Mathf.Lerp(6, 0.5f, cooldownSpeedSlider.normalizedValue);
         cooldownSpeedValueText.text = (Mathf.Round(100 * cooldownSpeed) / 100).ToString();
     }
 
