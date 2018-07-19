@@ -331,8 +331,6 @@ public class ShootProjectile : MonoBehaviour
             recoilCurveTime += Time.deltaTime;
             previousRecoilAngle = recoilAngle;
             recoilAngle = previousRecoilTime + recoilCurve.Evaluate(recoilCurveTime);
-            //recoilQuaternion = Quaternion.AngleAxis(-recoilAngle, Vector3.right);
-            //playerCamera.transform.localRotation = new Quaternion(1, 0, 0, 0) * recoilQuaternion;
         }
 
         if (recoilAngle != previousRecoilAngle)
@@ -398,6 +396,12 @@ public class ShootProjectile : MonoBehaviour
                     bullet.transform.localScale = new Vector3(bullet.transform.localScale.x * size, bullet.transform.localScale.y * size, bullet.transform.localScale.z * size);
                 }
 
+                if (energyBoostOn)
+                {
+                    ChangeDamage();
+                    damage += Mathf.Round(currentEnergy * (energyBoost - 1) * 0.01f * damage);
+                }
+
                 if (typeOfGun == gunType.Lazer)
                 {
                     CastRay(transform.position, transform.forward);
@@ -415,12 +419,6 @@ public class ShootProjectile : MonoBehaviour
                             CastRay(transform.position, transform.forward);
                         }
                     }
-                }
-
-                if (energyBoostOn)
-                {
-                    damage = damageSlider.value;
-                    damage += Mathf.Round(currentEnergy * (energyBoost - 1) * 0.01f * damage);
                 }
 
                 if (bulletSpreadOn || repeaterOn)
@@ -445,13 +443,10 @@ public class ShootProjectile : MonoBehaviour
                     bullets.Add(bullet8);
 
                     if (bulletSpreadOn)
-                    {
-                        float plusOrMinus = -1;
-                        
+                    {   
                         for (int i = 1; i <= numberOfAdditionalBullets; i++)
                         {
-                            plusOrMinus *= -1;
-                            bullets[i - 1] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z + (plusOrMinus * 0.1f * i)), transform.rotation, null) as Rigidbody;
+                            bullets[i - 1] = Instantiate(bullet, transform.position, transform.rotation, null) as Rigidbody;
                         }
                     }
 
@@ -477,15 +472,22 @@ public class ShootProjectile : MonoBehaviour
                     ChangeCooldownSpeed();
                     ChangeBulletVelocity();
 
-                    for (int i = 0; i < bullets.Count; i++)
+                    float plusOrMinus = -1;
+
+                    for (int i = 1; i <= numberOfAdditionalBullets; i++)
                     {
-                        bullets[i].GetComponent<ProjectileBehavior>().projectileDamage = damage;
-                        bullets[i].GetComponent<ProjectileBehavior>().projectileRange = distance;
-                        bullets[i].GetComponent<ProjectileBehavior>().projectileDamageFallOff = range;
-                        bullets[i].GetComponent<ProjectileBehavior>().projectileEndPoint = rangeEndPoint;
+                        bullets[i - 1].GetComponent<ProjectileBehavior>().projectileDamage = damage;
+                        bullets[i - 1].GetComponent<ProjectileBehavior>().projectileRange = distance;
+                        bullets[i - 1].GetComponent<ProjectileBehavior>().projectileDamageFallOff = range;
+                        bullets[i - 1].GetComponent<ProjectileBehavior>().projectileEndPoint = rangeEndPoint;
+
 
                         if (bulletSpreadOn)
-                            bullets[i].AddForce(transform.forward * bulletVelocity);
+                        {
+                            plusOrMinus *= -1;
+                            bullets[i - 1].AddRelativeForce(0, plusOrMinus * 30 * i, 0);
+                            bullets[i - 1].AddForce(transform.forward * bulletVelocity);
+                        }
                     }
                 }
 

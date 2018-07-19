@@ -8,13 +8,13 @@ public class SwitchMenuTabs : MonoBehaviour
     [SerializeField]
     GameObject tuningPanel;
     [SerializeField]
-    GameObject scopeGunArms;
-    [SerializeField]
     ShootProjectile projectileSpawn;
     [SerializeField]
     CursorLock cLock;
     [SerializeField]
     CameraMouseLook playerCamera;
+
+    public GameObject scopeGunArms;
 
     public void PressTabButton()
     {

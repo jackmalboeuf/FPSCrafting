@@ -15,6 +15,8 @@ public class ChangeAltAttack : MonoBehaviour
     Transform pistolSpawnHolder;
     [SerializeField]
     GameObject pistolArms;
+    [SerializeField]
+    SwitchMenuTabs menuTab;
 
     Dropdown altAttackDropdown;
 
@@ -30,12 +32,14 @@ public class ChangeAltAttack : MonoBehaviour
             projectileSpawn.transform.SetParent(rifleSpawnHolder);
             rifleArms.SetActive(true);
             pistolArms.SetActive(false);
+            menuTab.scopeGunArms = rifleArms;
         }
         else if (altAttackDropdown.value == 1)
         {
             projectileSpawn.transform.SetParent(pistolSpawnHolder);
             pistolArms.SetActive(true);
             rifleArms.SetActive(false);
+            menuTab.scopeGunArms = pistolArms;
         }
     }
 }
