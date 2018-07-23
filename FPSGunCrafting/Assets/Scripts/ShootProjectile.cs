@@ -137,12 +137,14 @@ public class ShootProjectile : MonoBehaviour
     public bool bulletDropOn = false;
     [HideInInspector]
     public float currentEnergy;
-    [HideInInspector]
+    //[HideInInspector]
     public float recoilAngle;
-    [HideInInspector]
+    //[HideInInspector]
     public float yMin = -90;
-    [HideInInspector]
+    //[HideInInspector]
     public float yMax = 90;
+    [HideInInspector]
+    public bool isCoolingDown;
 
     float fireRate = 0.3f;
     float accuracy = 5;
@@ -158,7 +160,6 @@ public class ShootProjectile : MonoBehaviour
     float nextFireTime;
     float currentMagazineCount;
     bool isReloading;
-    bool isCoolingDown;
     bool isReducingEnergy;
     float maximumEnergy = 100;
     float cooldownPauseTime = 0.5f;
@@ -177,7 +178,8 @@ public class ShootProjectile : MonoBehaviour
     float previousRecoilAngle;
     bool canRepeat = true;
     List<Coroutine> cooldownCoroutines = new List<Coroutine>();
-    
+    float recoilRef;
+
     void Awake()
     {
         isReloading = false;
@@ -330,7 +332,19 @@ public class ShootProjectile : MonoBehaviour
         {
             recoilCurveTime += Time.deltaTime;
             previousRecoilAngle = recoilAngle;
-            recoilAngle = previousRecoilTime + recoilCurve.Evaluate(recoilCurveTime);
+
+            if (!isCoolingDown || isReducingEnergy)
+            {
+                recoilAngle = previousRecoilTime + recoilCurve.Evaluate(recoilCurveTime);
+                recoilAngle = Mathf.Clamp(recoilAngle, 0, 200);
+            }
+
+            if (recoilAngle >= 200)
+            {
+                //accuracy += 3;
+            }
+            //recoilAngle = Mathf.SmoothDamp(recoilAngle, 0, ref recoilRef, 0.1f);
+            //transform.localEulerAngles = transform.localEulerAngles + Vector3.right * recoilAngle;
         }
 
         if (recoilAngle != previousRecoilAngle)
@@ -629,6 +643,12 @@ public class ShootProjectile : MonoBehaviour
     {
         currentEnergy -= maximumEnergy / (cooldownSpeed / Time.deltaTime);
         overheatSlider.value = currentEnergy;
+
+        if (recoilAngle > 0)
+        {
+            print("asd");
+            recoilAngle -= 1;
+        }
     }
 
     IEnumerator Reload()
@@ -792,7 +812,7 @@ public class ShootProjectile : MonoBehaviour
 
     public void ChangeMeleeDamage()
     {
-        meleeDamage = Mathf.Round(Mathf.Lerp(100, 500, meleeDamageSlider.normalizedValue));
+        meleeDamage = Mathf.Round(Mathf.Lerp(50, 300, meleeDamageSlider.normalizedValue));
         meleeDamageValueText.text = meleeDamage.ToString();
     }
 

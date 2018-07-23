@@ -13,6 +13,8 @@ public class SwitchMenuTabs : MonoBehaviour
     CursorLock cLock;
     [SerializeField]
     CameraMouseLook playerCamera;
+    [SerializeField]
+    Transform overheatSlider;
 
     public GameObject scopeGunArms;
 
@@ -34,5 +36,7 @@ public class SwitchMenuTabs : MonoBehaviour
         cLock.projectileSpawn = projectileSpawn;
         playerCamera.projectileSpawn = projectileSpawn;
         projectileSpawn.currentEnergy = 0;
+        projectileSpawn.isCoolingDown = false;
+        overheatSlider.transform.GetChild(1).GetComponentInChildren<Image>().color = Color.white;
     }
 }

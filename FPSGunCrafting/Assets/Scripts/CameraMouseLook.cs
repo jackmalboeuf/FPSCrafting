@@ -21,7 +21,7 @@ public class CameraMouseLook : MonoBehaviour
 
     float rotationX = 0F;
     float rotationY = 0F;
-    Quaternion originalRotation;
+    public Quaternion originalRotation;
     CursorLockMode cursorMode;
 
     void Update()
@@ -46,7 +46,7 @@ public class CameraMouseLook : MonoBehaviour
         }
         else
         {
-            if (projectileSpawn.typeOfGun == ShootProjectile.gunType.SemiAuto|| projectileSpawn.typeOfGun == ShootProjectile.gunType.Lazer)
+            if (projectileSpawn.typeOfGun == ShootProjectile.gunType.SemiAuto || projectileSpawn.typeOfGun == ShootProjectile.gunType.Lazer)
             {
                 minimumY = projectileSpawn.yMin;
                 maximumY = projectileSpawn.yMax;
@@ -74,10 +74,5 @@ public class CameraMouseLook : MonoBehaviour
         if (angle > 360F)
             angle -= 360F;
         return Mathf.Clamp(angle, min, max);
-    }
-
-    public void SetRotation(Transform other)
-    {
-
     }
 }
