@@ -46,6 +46,6 @@ public class DropdownBehavior : MonoBehaviour
         sLimit.UpdateLimitText();
         shoot.ChangeDamage();
         shoot.ChangeFireRate();
-        shoot.ChangeDistance();
+        shoot.ChangeRange();
     }
 }

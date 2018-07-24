@@ -137,14 +137,20 @@ public class ShootProjectile : MonoBehaviour
     public bool bulletDropOn = false;
     [HideInInspector]
     public float currentEnergy;
-    //[HideInInspector]
+    [HideInInspector]
     public float recoilAngle;
-    //[HideInInspector]
+    [HideInInspector]
     public float yMin = -90;
-    //[HideInInspector]
+    [HideInInspector]
     public float yMax = 90;
     [HideInInspector]
     public bool isCoolingDown;
+    [HideInInspector]
+    public float recoilCurveTime = 0;
+    [HideInInspector]
+    public float previousRecoilTime = 0;
+    [HideInInspector]
+    public bool recoilSpreadOn = false;
 
     float fireRate = 0.3f;
     float accuracy = 5;
@@ -173,12 +179,10 @@ public class ShootProjectile : MonoBehaviour
     float recoilSmoothDampVelocity;
     float gunKickback = 0.05f;
     Transform kickbackTransform;
-    float recoilCurveTime = 0;
-    float previousRecoilTime = 0;
     float previousRecoilAngle;
     bool canRepeat = true;
     List<Coroutine> cooldownCoroutines = new List<Coroutine>();
-    float recoilRef;
+    //float recoilRef;
 
     void Awake()
     {
@@ -333,15 +337,13 @@ public class ShootProjectile : MonoBehaviour
             recoilCurveTime += Time.deltaTime;
             previousRecoilAngle = recoilAngle;
 
-            if (!isCoolingDown || isReducingEnergy)
+            recoilAngle = previousRecoilTime + recoilCurve.Evaluate(recoilCurveTime);
+            recoilAngle = Mathf.Clamp(recoilAngle, 0, 200);
+            
+            if (recoilAngle >= 200 && !recoilSpreadOn)
             {
-                recoilAngle = previousRecoilTime + recoilCurve.Evaluate(recoilCurveTime);
-                recoilAngle = Mathf.Clamp(recoilAngle, 0, 200);
-            }
-
-            if (recoilAngle >= 200)
-            {
-                //accuracy += 3;
+                accuracy += 5;
+                recoilSpreadOn = true;
             }
             //recoilAngle = Mathf.SmoothDamp(recoilAngle, 0, ref recoilRef, 0.1f);
             //transform.localEulerAngles = transform.localEulerAngles + Vector3.right * recoilAngle;
@@ -643,12 +645,6 @@ public class ShootProjectile : MonoBehaviour
     {
         currentEnergy -= maximumEnergy / (cooldownSpeed / Time.deltaTime);
         overheatSlider.value = currentEnergy;
-
-        if (recoilAngle > 0)
-        {
-            print("asd");
-            recoilAngle -= 1;
-        }
     }
 
     IEnumerator Reload()
@@ -752,8 +748,11 @@ public class ShootProjectile : MonoBehaviour
 
     public void ChangeAccuracy()
     {
-        accuracy = Mathf.Lerp(5, 1, accuracySlider.normalizedValue);
-        accuracyValueText.text = (Mathf.Round(100 * accuracy) / 100).ToString();
+        if (typeOfGun == gunType.Auto || typeOfGun == gunType.Lazer)
+        {
+            accuracy = Mathf.Lerp(5, 1, accuracySlider.normalizedValue);
+            accuracyValueText.text = (Mathf.Round(100 * accuracy) / 100).ToString();
+        }
     }
 
     public void ChangeStability()
@@ -761,7 +760,7 @@ public class ShootProjectile : MonoBehaviour
         if (typeOfGun == gunType.SemiAuto)
             stability = Mathf.Lerp(7, 2, stabilitySlider.normalizedValue);
         if (typeOfGun == gunType.Lazer)
-            stability = Mathf.Lerp(5, 2, stabilitySlider.normalizedValue);
+            stability = Mathf.Lerp(3, 1, stabilitySlider.normalizedValue);
 
         stabilityValueText.text = (Mathf.Round(100 * stability) / 100).ToString();
     }
